@@ -306,7 +306,6 @@ private: System::Void Previous_Click(System::Object^ sender, System::EventArgs^ 
 	if (page > 0) {
 		this->Previous->Enabled = true;
 	}
-
 }
 private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e) {
 	if (page>=0 && page < 10) {
