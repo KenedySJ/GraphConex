@@ -315,7 +315,7 @@ private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e) 
 	else {
 		// Hola Munde
 		// Los quiero mucho
-		// Los amo padres
+		// Los amo padres, los amoooo
 		Page_Timer->Stop();
 		this->Start_Pause->Text = L"\u23F5";
 	}
