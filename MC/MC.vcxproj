@@ -134,6 +134,7 @@
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="algoritmo.h" />
     <ClInclude Include="MainPanel.h">
       <FileType>CppForm</FileType>
     </ClInclude>
