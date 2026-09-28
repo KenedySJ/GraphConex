@@ -1,9 +1,8 @@
-#pragma once
-
 // ============================================================
 // PROYECTO 1 - COMPONENTES CONEXAS
 // Matriz de Adyacencia + Matriz de Caminos
 // ============================================================
+
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -87,7 +86,7 @@ Matriz construirMatrizCaminos(const Matriz& ady) {
 }
 // ============================================================
 // PASO 2: ORDEN DE LAS FILAS
-// más 1s primero, luego menor primera columna, luego menor nodo
+// más 1s primero, luego menor primera columna, luego fila igual (mismos alcanzables), luego menor nodo
 // ============================================================
 
 vector<int> obtenerOrdenFilas(const Matriz& caminos) {
@@ -103,6 +102,9 @@ vector<int> obtenerOrdenFilas(const Matriz& caminos) {
         int colA = primeraColumna(caminos[a]);
         int colB = primeraColumna(caminos[b]);
         if (colA != colB) return colA < colB;
+
+        // Nodos de la misma componente tienen filas idénticas: así quedan juntos
+        if (caminos[a] != caminos[b]) return caminos[a] > caminos[b];
 
         return a < b;
         });
@@ -141,27 +143,14 @@ vector<vector<int>> obtenerBloques(const Matriz& ordenada, const vector<int>& or
             fin++;
 
         bloques.push_back(vector<int>(orden.begin() + inicio, orden.begin() + fin));
-        inicio = fin;
+        inicio = fin; // el siguiente cuadrado empieza en (fin, fin), o sea i+n+1
     }
     return bloques;
-}
-
-// Bloques de tamaño >= 2 son componentes; de tamaño 1 son nodos aislados
-void clasificarBloques(const vector<vector<int>>& bloques,
-    vector<vector<int>>& componentes,
-    vector<int>& aislados) {
-    for (const auto& bloque : bloques) {
-        if (bloque.size() == 1) aislados.push_back(bloque[0]);
-        else componentes.push_back(bloque);
-    }
 }
 
 
 // ============================================================
 // IMPRESIÓN (solo para probar en consola)
-// TOMA EN CUENTA QUE ESTOS PASOS NO SON NECESARIOS PARA EL ALGORITMO EN SÍ
-// SOLO SIRVEN PARA VER EL PROCESO PASO A PASO EN CONSOLA
-// LO QUE TENEMOS QUE HACER ES USAR LA LÓGICA DE ESTAS FUNCIONES PARA MOSTRAR EL PROCESO EN EL FORMULARIO   
 // ============================================================
 
 void mostrarTitulo(const string& titulo) {
@@ -193,23 +182,25 @@ string nodosATexto(const vector<int>& nodos, const string& sep) {
     return texto;
 }
 
+/*
 // ============================================================
 // MAIN
 // ============================================================
-/*
- 
- NOTA IMPORTANTE:
- Este es un prototipo hecho en consola, para probar el algoritmo paso a paso.
- toma la logica de como usa la función mostrarMatriz() para mostrar los pasos del algoritmo.
- también la uso para 
+
+Este es un main de ejemplo para probar el algoritmo completo.
+Lo que nos queda por hacer es crear un panel gráfico 
+para que el usuario pueda ingresar la matriz de adyacencia 
+y ver los resultados paso a paso.
+
+
 
 int main() {
 
     Matriz matrizAdyacencia = {
-    {1, 1, 0, 0, 0},
-    {0, 1, 1, 1, 1},
-    {0, 0, 1, 0, 1},
-    {1, 0, 0, 1, 0},
+    {0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1},
+    {0, 1, 0, 0, 1},
+    {0, 1, 0, 0, 0},
     {0, 0, 1, 0, 0},
     };
 
@@ -238,17 +229,11 @@ int main() {
         cout << "Bloque " << i + 1 << ": " << nodosATexto(bloques[i], "; ")
         << " (" << bloques[i].size() << "x" << bloques[i].size() << ")\n";
 
-    vector<vector<int>> componentes;
-    vector<int> aislados;
-    clasificarBloques(bloques, componentes, aislados);
-
+    // Todo bloque cuadrado es una componente (incluidos los de 1x1)
     mostrarTitulo("RESULTADO FINAL");
-    cout << "Cantidad de componentes conexas: " << componentes.size() << "\n";
-    for (size_t i = 0; i < componentes.size(); i++)
-        cout << "Componente " << i + 1 << ": { " << nodosATexto(componentes[i], ", ") << " }\n";
-
-    if (!aislados.empty())
-        cout << "\nNodos aislados (bloques 1x1, no contabilizados): [" << nodosATexto(aislados, ", ") << "]\n";
+    cout << "Cantidad de componentes conexas: " << bloques.size() << "\n";
+    for (size_t i = 0; i < bloques.size(); i++)
+        cout << "Componente " << i + 1 << ": { " << nodosATexto(bloques[i], ", ") << " }\n";
 
     return 0;
 }
