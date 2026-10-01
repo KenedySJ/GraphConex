@@ -1,5 +1,9 @@
 ﻿#pragma once
 #include "Grafo.h"
+#include "algoritmo.h" 
+#include "MatrizForm.h" // NUEVO: Incluimos el nuevo formulario de la tabla interactiva
+#include <iostream>
+
 namespace MC {
 
 	using namespace System;
@@ -13,8 +17,8 @@ namespace MC {
 	{
 	private:
 		int page = 0;
-		int max_pages = 3; // Paso 0 al 3 (4 etapas en total)
-		Grafo* miGrafo = nullptr; // CAMBIO: Uso de puntero nativo C++ porque Grafo usa std::vector
+		int max_pages = 3;
+		Grafo* miGrafo = nullptr;
 
 	public:
 		MainPanel(void)
@@ -30,7 +34,6 @@ namespace MC {
 			{
 				delete components;
 			}
-			// CAMBIO: Liberar memoria del grafo al cerrar
 			if (miGrafo != nullptr) {
 				delete miGrafo;
 				miGrafo = nullptr;
@@ -43,7 +46,7 @@ namespace MC {
 	private: System::Windows::Forms::Button^ Start_Pause;
 	private: System::Windows::Forms::Button^ Previous;
 	private: System::Windows::Forms::Button^ Beginning;
-	private: System::Windows::Forms::Panel^ Graph_Panel;
+	private: System::Windows::Forms::Panel^ Graph_Panel; // Aquí se verán los grafos visuales
 	private: System::Windows::Forms::GroupBox^ Inputs_Panel;
 	private: System::Windows::Forms::TextBox^ NumberofNodes_TextBox;
 	private: System::Windows::Forms::Label^ NumberofNodes_Label;
@@ -77,9 +80,8 @@ namespace MC {
 			   this->Graph_Panel->SuspendLayout();
 			   this->Inputs_Panel->SuspendLayout();
 			   this->SuspendLayout();
-			   // 
-			   // Buttons
-			   // 
+
+			   // [Controles de botones de reproducción omitidos por brevedad, son idénticos]
 			   this->Buttons->Controls->Add(this->Final);
 			   this->Buttons->Controls->Add(this->Next);
 			   this->Buttons->Controls->Add(this->Start_Pause);
@@ -90,9 +92,7 @@ namespace MC {
 			   this->Buttons->Size = System::Drawing::Size(415, 100);
 			   this->Buttons->TabIndex = 0;
 			   this->Buttons->TabStop = false;
-			   // 
-			   // Final
-			   // 
+
 			   this->Final->Cursor = System::Windows::Forms::Cursors::Hand;
 			   this->Final->Location = System::Drawing::Point(333, 41);
 			   this->Final->Name = L"Final";
@@ -101,9 +101,7 @@ namespace MC {
 			   this->Final->Text = L"⏭";
 			   this->Final->UseVisualStyleBackColor = true;
 			   this->Final->Click += gcnew System::EventHandler(this, &MainPanel::Final_Click);
-			   // 
-			   // Next
-			   // 
+
 			   this->Next->Cursor = System::Windows::Forms::Cursors::Hand;
 			   this->Next->Location = System::Drawing::Point(253, 42);
 			   this->Next->Name = L"Next";
@@ -112,9 +110,7 @@ namespace MC {
 			   this->Next->Text = L"⏩";
 			   this->Next->UseVisualStyleBackColor = true;
 			   this->Next->Click += gcnew System::EventHandler(this, &MainPanel::Next_Click);
-			   // 
-			   // Start_Pause
-			   // 
+
 			   this->Start_Pause->Cursor = System::Windows::Forms::Cursors::Hand;
 			   this->Start_Pause->Location = System::Drawing::Point(178, 41);
 			   this->Start_Pause->Name = L"Start_Pause";
@@ -123,9 +119,7 @@ namespace MC {
 			   this->Start_Pause->Text = L"⏵";
 			   this->Start_Pause->UseVisualStyleBackColor = true;
 			   this->Start_Pause->Click += gcnew System::EventHandler(this, &MainPanel::Start_Pause_Click);
-			   // 
-			   // Previous
-			   // 
+
 			   this->Previous->Cursor = System::Windows::Forms::Cursors::Hand;
 			   this->Previous->Location = System::Drawing::Point(106, 43);
 			   this->Previous->Name = L"Previous";
@@ -135,9 +129,7 @@ namespace MC {
 			   this->Previous->UseVisualStyleBackColor = true;
 			   this->Previous->Enabled = false;
 			   this->Previous->Click += gcnew System::EventHandler(this, &MainPanel::Previous_Click);
-			   // 
-			   // Beginning
-			   // 
+
 			   this->Beginning->Cursor = System::Windows::Forms::Cursors::Hand;
 			   this->Beginning->Location = System::Drawing::Point(28, 43);
 			   this->Beginning->Name = L"Beginning";
@@ -146,21 +138,18 @@ namespace MC {
 			   this->Beginning->Text = L"⏮";
 			   this->Beginning->UseVisualStyleBackColor = true;
 			   this->Beginning->Click += gcnew System::EventHandler(this, &MainPanel::Beginning_Click);
-			   // 
-			   // Graph_Panel
-			   // 
-			   this->Graph_Panel->BackColor = System::Drawing::Color::White; // CAMBIO: Fondo blanco para ver mejor
+
+			   // Graph_Panel - Solo alojará el dibujo de los grafos
+			   this->Graph_Panel->BackColor = System::Drawing::Color::White;
 			   this->Graph_Panel->Controls->Add(this->Testing_Label);
 			   this->Graph_Panel->Location = System::Drawing::Point(212, 65);
 			   this->Graph_Panel->Name = L"Graph_Panel";
 			   this->Graph_Panel->Size = System::Drawing::Size(415, 277);
 			   this->Graph_Panel->TabIndex = 1;
-			   // CAMBIO: Enlace del evento Paint
 			   this->Graph_Panel->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &MainPanel::Graph_Panel_Paint);
-			   // 
+
 			   // Testing_Label
-			   // 
-			   this->Testing_Label->AutoSize = true; // CAMBIO: Autosize para que quepa el texto
+			   this->Testing_Label->AutoSize = true;
 			   this->Testing_Label->Font = (gcnew System::Drawing::Font(L"Modern No. 20", 14.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				   static_cast<System::Byte>(0)));
 			   this->Testing_Label->Location = System::Drawing::Point(10, 10);
@@ -168,9 +157,8 @@ namespace MC {
 			   this->Testing_Label->Size = System::Drawing::Size(56, 52);
 			   this->Testing_Label->TabIndex = 0;
 			   this->Testing_Label->Text = L"Paso 0";
-			   // 
+
 			   // Inputs_Panel
-			   // 
 			   this->Inputs_Panel->Controls->Add(this->GraphGeneratorManual_Botton);
 			   this->Inputs_Panel->Controls->Add(this->GraphGeneratorAutomatic_Button_);
 			   this->Inputs_Panel->Controls->Add(this->GrafoGenerator_Label);
@@ -181,9 +169,8 @@ namespace MC {
 			   this->Inputs_Panel->Size = System::Drawing::Size(147, 442);
 			   this->Inputs_Panel->TabIndex = 2;
 			   this->Inputs_Panel->TabStop = false;
-			   // 
+
 			   // GraphGeneratorManual_Botton
-			   // 
 			   this->GraphGeneratorManual_Botton->Cursor = System::Windows::Forms::Cursors::Hand;
 			   this->GraphGeneratorManual_Botton->Location = System::Drawing::Point(17, 295);
 			   this->GraphGeneratorManual_Botton->Name = L"GraphGeneratorManual_Botton";
@@ -191,9 +178,10 @@ namespace MC {
 			   this->GraphGeneratorManual_Botton->TabIndex = 4;
 			   this->GraphGeneratorManual_Botton->Text = L"Manual";
 			   this->GraphGeneratorManual_Botton->UseVisualStyleBackColor = true;
-			   // 
+			   // NUEVO: Vincular el evento click para abrir la ventana de matriz interactiva
+			   this->GraphGeneratorManual_Botton->Click += gcnew System::EventHandler(this, &MainPanel::GraphGeneratorManual_Botton_Click);
+
 			   // GraphGeneratorAutomatic_Button_
-			   // 
 			   this->GraphGeneratorAutomatic_Button_->Cursor = System::Windows::Forms::Cursors::Hand;
 			   this->GraphGeneratorAutomatic_Button_->Location = System::Drawing::Point(17, 342);
 			   this->GraphGeneratorAutomatic_Button_->Name = L"GraphGeneratorAutomatic_Button_";
@@ -201,39 +189,33 @@ namespace MC {
 			   this->GraphGeneratorAutomatic_Button_->TabIndex = 3;
 			   this->GraphGeneratorAutomatic_Button_->Text = L"Automatica";
 			   this->GraphGeneratorAutomatic_Button_->UseVisualStyleBackColor = true;
-			   // CAMBIO: Enlace del evento Click
 			   this->GraphGeneratorAutomatic_Button_->Click += gcnew System::EventHandler(this, &MainPanel::GraphGeneratorAutomatic_Button__Click);
-			   // 
+
 			   // GrafoGenerator_Label
-			   // 
 			   this->GrafoGenerator_Label->Location = System::Drawing::Point(17, 252);
 			   this->GrafoGenerator_Label->Name = L"GrafoGenerator_Label";
 			   this->GrafoGenerator_Label->Size = System::Drawing::Size(100, 25);
 			   this->GrafoGenerator_Label->TabIndex = 2;
 			   this->GrafoGenerator_Label->Text = L"Generar Grafo:";
-			   // 
+
 			   // NumberofNodes_TextBox
-			   // 
 			   this->NumberofNodes_TextBox->Location = System::Drawing::Point(17, 67);
 			   this->NumberofNodes_TextBox->Name = L"NumberofNodes_TextBox";
 			   this->NumberofNodes_TextBox->Size = System::Drawing::Size(100, 20);
 			   this->NumberofNodes_TextBox->TabIndex = 1;
-			   // 
+
 			   // NumberofNodes_Label
-			   // 
 			   this->NumberofNodes_Label->Location = System::Drawing::Point(17, 39);
 			   this->NumberofNodes_Label->Name = L"NumberofNodes_Label";
 			   this->NumberofNodes_Label->Size = System::Drawing::Size(100, 37);
 			   this->NumberofNodes_Label->TabIndex = 0;
 			   this->NumberofNodes_Label->Text = L"Cantidad de Nodos (4-12):";
-			   // 
+
 			   // Page_Timer
-			   // 
-			   this->Page_Timer->Interval = 1500; // CAMBIO: 1.5 segundos entre pasos para que el usuario pueda ver
+			   this->Page_Timer->Interval = 1500;
 			   this->Page_Timer->Tick += gcnew System::EventHandler(this, &MainPanel::timer1_Tick);
-			   // 
+
 			   // MainPanel
-			   // 
 			   this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			   this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			   this->ClientSize = System::Drawing::Size(679, 519);
@@ -257,7 +239,6 @@ namespace MC {
 		this->Previous->Enabled = (page > 0);
 		this->Next->Enabled = (page < max_pages);
 
-		// CAMBIO: Lógica descriptiva de los pasos de tu algoritmo
 		if (page == 0) {
 			Testing_Label->Text = "Paso 0: Grafo Inicial (Matriz de Adyacencia)";
 		}
@@ -271,20 +252,19 @@ namespace MC {
 			Testing_Label->Text = "Paso 3: Componentes Conexas Encontradas";
 		}
 
-		// Avisar al panel que debe volver a dibujar usando el nuevo "page"
 		Graph_Panel->Invalidate();
 	}
 
 	private: System::Void Start_Pause_Click(System::Object^ sender, System::EventArgs^ e) {
-		if (miGrafo == nullptr) return; // Validar que haya grafo creado
+		if (miGrafo == nullptr) return;
 
 		if (Page_Timer->Enabled == false) {
 			Page_Timer->Start();
-			this->Start_Pause->Text = L"\u23F8"; // Simbolo Pausa
+			this->Start_Pause->Text = L"\u23F8";
 		}
 		else {
 			Page_Timer->Stop();
-			this->Start_Pause->Text = L"\u23F5"; // Simbolo Play
+			this->Start_Pause->Text = L"\u23F5";
 		}
 	}
 
@@ -309,7 +289,7 @@ namespace MC {
 		}
 		else {
 			Page_Timer->Stop();
-			this->Start_Pause->Text = L"\u23F5"; // Vuelve a símbolo Play
+			this->Start_Pause->Text = L"\u23F5";
 		}
 	}
 
@@ -329,27 +309,152 @@ namespace MC {
 
 	private: System::Void Graph_Panel_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
 		if (miGrafo != nullptr) {
-			// Enviar la variable "page" para que el grafo sepa si debe cambiar de color
 			miGrafo->dibujar(e->Graphics, page);
 		}
 	}
 
+		   // NUEVO EVENTO: Al hacer clic en el botón "Manual"
+	private: System::Void GraphGeneratorManual_Botton_Click(System::Object^ sender, System::EventArgs^ e) {
+		int n;
+		if (Int32::TryParse(NumberofNodes_TextBox->Text, n) && n >= 4 && n <= 12) {
+			// Crear la nueva ventana de MatrizForm
+			MatrizForm^ ventanaMatriz = gcnew MatrizForm(n);
+
+			// Suscribir a este formulario para recibir la matriz cuando el usuario termine
+			ventanaMatriz->OnMatrizConfirmada += gcnew MatrizConfirmadaEventHandler(this, &MainPanel::RecibirMatrizManual);
+
+			// Mostrar la ventana como un diálogo modal (bloquea la ventana principal hasta que termine)
+			ventanaMatriz->ShowDialog();
+		}
+		else {
+			MessageBox::Show("Por favor, ingrese un número entero válido entre 4 y 12.",
+				"Error de Validación", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		}
+	}
+
+		   // NUEVO MÉTODO: Se llama cuando el usuario presiona "Confirmar" en la ventana MatrizForm
+	private: void RecibirMatrizManual(std::vector<std::vector<int>> matrizAdy) {
+		int n = matrizAdy.size();
+
+		if (miGrafo != nullptr) { delete miGrafo; }
+
+		// 1. Se crea la base visual del panel
+		miGrafo = new Grafo(n, Graph_Panel->Width, Graph_Panel->Height);
+
+		// 2. Transferimos la información creada manualmente al Grafo visual
+		for (int i = 0; i < n; i++) {
+			for (int j = i + 1; j < n; j++) {
+				if (matrizAdy[i][j] == 1) {
+					// Gracias a la lógica espejo en MatrizForm, sabemos que si [i][j] es 1, [j][i] también lo es
+					miGrafo->agregarArista(i, j);
+				}
+			}
+		}
+
+		// 3. Calculamos la parte visual en Grafo.h
+		miGrafo->calcularComponentesConexas();
+
+		// 4. Imprimimos el proceso matemático paso a paso en la consola
+		std::cout << "\n============================================================\n";
+		std::cout << "INICIO DE GENERACION MANUAL - COMPONENTES CONEXAS";
+		std::cout << "\n============================================================\n";
+		mostrarMatriz(matrizAdy, "MATRIZ DE ADYACENCIA INICIAL");
+
+		Matriz caminos = construirMatrizCaminos(matrizAdy);
+		mostrarMatriz(caminos, "PASO 1: MATRIZ DE CAMINOS FINAL");
+
+		std::vector<int> orden = obtenerOrdenFilas(caminos);
+		mostrarTitulo("PASO 2: ORDEN DE LAS FILAS");
+		for (int i = 0; i < (int)caminos.size(); i++) {
+			std::cout << "Nodo " << i + 1 << ": " << cantidadUnos(caminos[i])
+				<< " unos | primer 1 en columna "
+				<< primeraColumna(caminos[i]) + 1 << "\n";
+		}
+		std::cout << "\nOrden de las filas: [" << nodosATexto(orden, ", ") << "]\n";
+
+		Matriz ordenada = reordenarMatriz(caminos, orden);
+		mostrarMatriz(ordenada, "PASO 3: FILAS Y COLUMNAS ORDENADAS");
+
+		std::vector<std::vector<int>> bloques = obtenerBloques(ordenada, orden);
+		mostrarTitulo("PASO 4: BLOQUES CUADRADOS");
+		for (size_t i = 0; i < bloques.size(); i++) {
+			std::cout << "Bloque " << i + 1 << ": " << nodosATexto(bloques[i], "; ")
+				<< " (" << bloques[i].size() << "x" << bloques[i].size() << ")\n";
+		}
+
+		mostrarTitulo("RESULTADO FINAL");
+		std::cout << "Cantidad de componentes conexas: " << bloques.size() << "\n";
+		for (size_t i = 0; i < bloques.size(); i++) {
+			std::cout << "Componente " << i + 1 << ": { " << nodosATexto(bloques[i], ", ") << " }\n";
+		}
+		std::cout << "\n*** REVISE EL PANEL GRAFICO PARA VER LA ANIMACION ***\n\n";
+
+		// Reiniciamos UI y temporizador
+		page = 0;
+		Page_Timer->Stop();
+		this->Start_Pause->Text = L"\u23F5";
+		ActualizarVistaPasoAPaso();
+	}
+
 	private: System::Void GraphGeneratorAutomatic_Button__Click(System::Object^ sender, System::EventArgs^ e) {
-    int n;
-    if (Int32::TryParse(NumberofNodes_TextBox->Text, n) && n >= 4 && n <= 12) {
-        if (miGrafo != nullptr) { delete miGrafo; }
+		int n;
+		if (Int32::TryParse(NumberofNodes_TextBox->Text, n) && n >= 4 && n <= 12) {
+			if (miGrafo != nullptr) { delete miGrafo; }
 
-        miGrafo = new Grafo(n, Graph_Panel->Width, Graph_Panel->Height);
-        
-        // ¡Descomentar estas llamadas clave!
-        miGrafo->generarMatrizAleatoria();
-        miGrafo->calcularComponentesConexas(); 
+			miGrafo = new Grafo(n, Graph_Panel->Width, Graph_Panel->Height);
 
-        page = 0;
-        Page_Timer->Stop();
-        this->Start_Pause->Text = L"\u23F5";
-        ActualizarVistaPasoAPaso();
-    }
+			// Generamos la matriz automáticamente
+			Matriz matrizAdy = generarMatrizAleatoria(n);
+
+			for (int i = 0; i < n; i++) {
+				for (int j = i + 1; j < n; j++) {
+					if (matrizAdy[i][j] == 1) {
+						miGrafo->agregarArista(i, j);
+					}
+				}
+			}
+
+			miGrafo->calcularComponentesConexas();
+
+			std::cout << "\n============================================================\n";
+			std::cout << "INICIO DE GENERACION AUTOMATICA - COMPONENTES CONEXAS";
+			std::cout << "\n============================================================\n";
+			mostrarMatriz(matrizAdy, "MATRIZ DE ADYACENCIA INICIAL");
+
+			Matriz caminos = construirMatrizCaminos(matrizAdy);
+			mostrarMatriz(caminos, "PASO 1: MATRIZ DE CAMINOS FINAL");
+
+			std::vector<int> orden = obtenerOrdenFilas(caminos);
+			mostrarTitulo("PASO 2: ORDEN DE LAS FILAS");
+			for (int i = 0; i < (int)caminos.size(); i++) {
+				std::cout << "Nodo " << i + 1 << ": " << cantidadUnos(caminos[i])
+					<< " unos | primer 1 en columna "
+					<< primeraColumna(caminos[i]) + 1 << "\n";
+			}
+			std::cout << "\nOrden de las filas: [" << nodosATexto(orden, ", ") << "]\n";
+
+			Matriz ordenada = reordenarMatriz(caminos, orden);
+			mostrarMatriz(ordenada, "PASO 3: FILAS Y COLUMNAS ORDENADAS");
+
+			std::vector<std::vector<int>> bloques = obtenerBloques(ordenada, orden);
+			mostrarTitulo("PASO 4: BLOQUES CUADRADOS");
+			for (size_t i = 0; i < bloques.size(); i++) {
+				std::cout << "Bloque " << i + 1 << ": " << nodosATexto(bloques[i], "; ")
+					<< " (" << bloques[i].size() << "x" << bloques[i].size() << ")\n";
+			}
+
+			mostrarTitulo("RESULTADO FINAL");
+			std::cout << "Cantidad de componentes conexas: " << bloques.size() << "\n";
+			for (size_t i = 0; i < bloques.size(); i++) {
+				std::cout << "Componente " << i + 1 << ": { " << nodosATexto(bloques[i], ", ") << " }\n";
+			}
+			std::cout << "\n*** REVISE EL PANEL GRAFICO PARA VER LA ANIMACION ***\n\n";
+
+			page = 0;
+			Page_Timer->Stop();
+			this->Start_Pause->Text = L"\u23F5";
+			ActualizarVistaPasoAPaso();
+		}
 		else {
 			MessageBox::Show("Por favor, ingrese un número entero válido entre 4 y 12.",
 				"Error de Validación", MessageBoxButtons::OK, MessageBoxIcon::Warning);

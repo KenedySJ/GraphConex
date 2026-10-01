@@ -131,6 +131,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainPanel.cpp" />
+    <ClCompile Include="MatrizForm.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +141,9 @@
     <ClInclude Include="Figura.h" />
     <ClInclude Include="Grafo.h" />
     <ClInclude Include="MainPanel.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="MatrizForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="x64\Arista.h" />
