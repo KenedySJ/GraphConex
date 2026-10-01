@@ -2,7 +2,7 @@
 
 // ============================================================
 // PROYECTO 1 - COMPONENTES CONEXAS
-// Matriz de Adyacencia + Matriz de Caminos (Fusionado)
+// Matriz de Adyacencia + Matriz de Caminos
 // ============================================================
 
 #include <iostream>
@@ -16,9 +16,6 @@ using namespace std;
 
 // Esta linea permite usar "vector<vector<int>>" como "Matriz"
 using Matriz = vector<vector<int>>;
-
-// Declaración previa
-inline void mostrarMatriz(const Matriz& m, const string& titulo);
 
 // ============================================================
 // CONSTRUCCIÓN DE LA MATRIZ DE ADYACENCIA
@@ -38,11 +35,6 @@ inline void agregarArista(Matriz& m, int a, int b) {
 
 // Genera un grafo aleatorio (aprox. 30% de probabilidad por arista)
 inline Matriz generarMatrizAleatoria(int n) {
-    static bool seeded = false;
-    if (!seeded) {
-        srand((unsigned)time(0));
-        seeded = true;
-    }
     Matriz m = crearMatrizVacia(n);
     for (int i = 0; i < n; i++)
         for (int j = i + 1; j < n; j++)
@@ -50,6 +42,8 @@ inline Matriz generarMatrizAleatoria(int n) {
                 agregarArista(m, i, j);
     return m;
 }
+
+inline void mostrarMatriz(const Matriz& m, const string& titulo);
 
 // ============================================================
 // FUNCIONES AUXILIARES (se reutilizan en varios pasos)
@@ -75,6 +69,7 @@ inline bool bloqueCompleto(const Matriz& m, int inicio, int fin) {
     return true;
 }
 
+
 // ============================================================
 // PASO 1: MATRIZ DE CAMINOS
 // ============================================================
@@ -88,36 +83,48 @@ inline Matriz construirMatrizCaminos(const Matriz& ady) {
             caminos[i][i] = 1;
         }
     }
-    mostrarMatriz(caminos, "MATRIZ DE CAMINOS (Diagonal de 1's)");
-
+    mostrarMatriz(
+        caminos,
+        "MATRIZ DE CAMINOS (Diagonal de 1's)"
+    );
     // k = nodo intermedio
     for (int k = 0; k < n; k++) {
         // i = nodo origen
         for (int i = 0; i < n; i++) {
-            // Si i no puede llegar a k, no podemos usar k como intermediario.
-            if (caminos[i][k] == 0) continue;
+            // Si i no puede llegar a k,
+            // no podemos usar k como intermediario.
+            if (caminos[i][k] == 0)
+                continue;
             // j = nodo destino
             for (int j = 0; j < n; j++) {
-                // Si k puede llegar a j, entonces i también puede llegar a j.
-                if (caminos[k][j] == 1 && caminos[i][j] == 0) {
+                // Si k puede llegar a j,
+                // entonces i también puede llegar a j.
+                if (caminos[k][j] == 1 &&
+                    caminos[i][j] == 0) {
+
                     caminos[i][j] = 1;
-                    mostrarMatriz(caminos, "PASO 1: MATRIZ DE CAMINOS (cambio)");
+                    mostrarMatriz(
+                        caminos,
+                        "PASO 1: MATRIZ DE CAMINOS (cambio)"
+                    );
                 }
             }
         }
     }
+
     return caminos;
 }
-
 // ============================================================
 // PASO 2: ORDEN DE LAS FILAS
+// más 1s primero, luego menor primera columna, luego fila igual (mismos alcanzables), luego menor nodo
 // ============================================================
+
 inline vector<int> obtenerOrdenFilas(const Matriz& caminos) {
     int n = caminos.size();
     vector<int> orden(n);
     for (int i = 0; i < n; i++) orden[i] = i;
 
-    sort(orden.begin(), orden.end(), [&](int a, int b) {
+    sort(orden.begin(), orden.end(), [&](int a, int b) { // a y b son indices de filas porque [&] permite acceder a la variable caminos
         int unosA = cantidadUnos(caminos[a]);
         int unosB = cantidadUnos(caminos[b]);
         if (unosA != unosB) return unosA > unosB;
@@ -134,9 +141,11 @@ inline vector<int> obtenerOrdenFilas(const Matriz& caminos) {
     return orden;
 }
 
+
 // ============================================================
 // PASO 3: ORDENAR FILAS Y COLUMNAS
 // ============================================================
+
 inline Matriz reordenarMatriz(const Matriz& m, const vector<int>& orden) {
     int n = orden.size();
     Matriz nueva(n, vector<int>(n));
@@ -148,9 +157,11 @@ inline Matriz reordenarMatriz(const Matriz& m, const vector<int>& orden) {
     return nueva;
 }
 
+
 // ============================================================
 // PASO 4: BLOQUES CUADRADOS Y COMPONENTES
 // ============================================================
+
 inline vector<vector<int>> obtenerBloques(const Matriz& ordenada, const vector<int>& orden) {
     int n = ordenada.size();
     vector<vector<int>> bloques;
@@ -162,14 +173,16 @@ inline vector<vector<int>> obtenerBloques(const Matriz& ordenada, const vector<i
             fin++;
 
         bloques.push_back(vector<int>(orden.begin() + inicio, orden.begin() + fin));
-        inicio = fin;
+        inicio = fin; // el siguiente cuadrado empieza en (fin, fin), o sea i+n+1
     }
     return bloques;
 }
 
+
 // ============================================================
 // IMPRESIÓN (solo para probar en consola)
 // ============================================================
+
 inline void mostrarTitulo(const string& titulo) {
     cout << "\n" << string(60, '=') << "\n" << titulo << "\n" << string(60, '=') << "\n";
 }
@@ -189,6 +202,7 @@ inline void mostrarMatriz(const Matriz& m, const string& titulo) {
     }
 }
 
+// Devuelve los nodos en base 1 separados por 'sep': "1, 2, 4"
 inline string nodosATexto(const vector<int>& nodos, const string& sep) {
     string texto;
     for (size_t i = 0; i < nodos.size(); i++) {
@@ -197,3 +211,60 @@ inline string nodosATexto(const vector<int>& nodos, const string& sep) {
     }
     return texto;
 }
+
+/*
+// ============================================================
+// MAIN
+// ============================================================
+
+Este es un main de ejemplo para probar el algoritmo completo.
+Lo que nos queda por hacer es crear un panel gráfico
+para que el usuario pueda ingresar la matriz de adyacencia
+y ver los resultados paso a paso.
+
+
+
+int main() {
+
+    Matriz matrizAdyacencia = {
+    {0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 1},
+    {0, 1, 0, 0, 1},
+    {0, 1, 0, 0, 0},
+    {0, 0, 1, 0, 0},
+    };
+
+    mostrarMatriz(matrizAdyacencia, "MATRIZ DE ADYACENCIA");
+
+    // Paso 1
+    Matriz caminos = construirMatrizCaminos(matrizAdyacencia);
+    mostrarMatriz(caminos, "PASO 1: MATRIZ DE CAMINOS FINAL");
+
+    // Paso 2
+    vector<int> orden = obtenerOrdenFilas(caminos);
+    mostrarTitulo("PASO 2: ORDEN DE LAS FILAS");
+    for (int i = 0; i < (int)caminos.size(); i++)
+        cout << "Nodo " << i + 1 << ": " << cantidadUnos(caminos[i]) << " unos | primer 1 en columna "
+        << primeraColumna(caminos[i]) + 1 << "\n";
+    cout << "\nOrden de las filas: [" << nodosATexto(orden, ", ") << "]\n";
+
+    // Paso 3
+    Matriz ordenada = reordenarMatriz(caminos, orden);
+    mostrarMatriz(ordenada, "PASO 3: FILAS Y COLUMNAS ORDENADAS");
+
+    // Paso 4
+    vector<vector<int>> bloques = obtenerBloques(ordenada, orden);
+    mostrarTitulo("PASO 4: BLOQUES CUADRADOS");
+    for (size_t i = 0; i < bloques.size(); i++)
+        cout << "Bloque " << i + 1 << ": " << nodosATexto(bloques[i], "; ")
+        << " (" << bloques[i].size() << "x" << bloques[i].size() << ")\n";
+
+    // Todo bloque cuadrado es una componente (incluidos los de 1x1)
+    mostrarTitulo("RESULTADO FINAL");
+    cout << "Cantidad de componentes conexas: " << bloques.size() << "\n";
+    for (size_t i = 0; i < bloques.size(); i++)
+        cout << "Componente " << i + 1 << ": { " << nodosATexto(bloques[i], ", ") << " }\n";
+
+    return 0;
+}
+*/
