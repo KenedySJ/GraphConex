@@ -33,7 +33,6 @@ inline void agregarArista(Matriz& m, int a, int b) {
     m[b][a] = 1;
 }
 
-// Genera un grafo aleatorio (aprox. 30% de probabilidad por arista)
 inline Matriz generarMatrizAleatoria(int n) {
     Matriz m = crearMatrizVacia(n);
     for (int i = 0; i < n; i++)

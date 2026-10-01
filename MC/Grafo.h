@@ -129,9 +129,14 @@ public:
 
     void generarMatrizAleatoria() {
         srand((unsigned)time(0));
+        int probabilidad = (rand() % 26) + 10;
+
         for (int i = 0; i < numNodos; i++) {
             for (int j = i + 1; j < numNodos; j++) {
-                if (rand() % 100 < 30) agregarArista(i, j);
+                // Usa la probabilidad dinámica calculada arriba
+                if (rand() % 100 < probabilidad) {
+                    agregarArista(i, j);
+                }
             }
         }
     }
