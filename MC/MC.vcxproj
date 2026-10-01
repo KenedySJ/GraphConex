@@ -44,7 +44,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CLRSupport>true</CLRSupport>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -138,6 +138,10 @@
     <ClInclude Include="MainPanel.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="x64\Arista.h" />
+    <ClInclude Include="x64\Circulo.h" />
+    <ClInclude Include="x64\Figura.h" />
+    <ClInclude Include="x64\Grafo.h" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MainPanel.resx">

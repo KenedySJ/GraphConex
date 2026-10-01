@@ -1,5 +1,7 @@
 ﻿#pragma once
-
+#include "Grafo.h"
+#include "Figura.h"
+#include "algoritmo.h"
 namespace MC {
 
 	using namespace System;
@@ -10,12 +12,12 @@ namespace MC {
 	using namespace System::Drawing;
 
 	/// <summary>
-	/// Resumen de MainPanel
 	/// </summary>
 	public ref class MainPanel : public System::Windows::Forms::Form
 	{
 	private:
 	int page = 0;
+	Grafo^ miGrafo;
 
 	public:
 		MainPanel(void)
@@ -263,6 +265,22 @@ namespace MC {
 #pragma endregion
 	private: System::Void button5_Click(System::Object^ sender, System::EventArgs^ e) {
 	}
+		   private: void ActualizarVistaPasoAPaso() {
+			   Testing_Label->Text = "Paso " + page;
+			   this->Previous->Enabled = (page > 0);
+			   this->Next->Enabled = (page < 4);
+
+			   if (page == 0) {
+			   }
+			   else if (page == 1) {
+			   }
+			   else if (page == 2) {
+			   }
+			   else if (page == 4) {
+			   }
+
+			   Graph_Panel->Invalidate(); // Repintar el gráfico segun la pagina
+		   }
 private: System::Void Start_Pause_Click(System::Object^ sender, System::EventArgs^ e) {
 
 	if (Page_Timer->Enabled == false) {
@@ -283,30 +301,16 @@ private: System::Void Start_Pause_Click(System::Object^ sender, System::EventArg
 private: System::Void Inputs_Panel_Enter(System::Object^ sender, System::EventArgs^ e) {
 }
 private: System::Void Next_Click(System::Object^ sender, System::EventArgs^ e) {
-	page++;
-	this->Testing_Label->Text = System::Convert::ToString(page);
-
-	this->Graph_Panel->Focus();
-	if (page == 0) {
-		this->Previous->Enabled = false;
-	}
-	if (page > 0) {
-		this->Previous->Enabled = true;
-	}
+	if (page < 4) page++; // Limitamos hasta el paso 4
+	ActualizarVistaPasoAPaso(); // Llamamos a una función auxiliar
 }
 private: System::Void Testing_Label_Click(System::Object^ sender, System::EventArgs^ e) {
 }
 private: System::Void Previous_Click(System::Object^ sender, System::EventArgs^ e) {
-	page--;
-	this->Testing_Label->Text = System::Convert::ToString(page);
-	this->Graph_Panel->Focus();
-	if (page == 0) {
-		this->Previous->Enabled = false;
-	}
-	if (page > 0) {
-		this->Previous->Enabled = true;
-	}
+	if (page > 0) page--;
+	ActualizarVistaPasoAPaso();
 }
+
 private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e) {
 	if (page>=0 && page < 10) {
 		page++;
@@ -323,5 +327,30 @@ private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e) 
 private: System::Void Beginning_Click(System::Object^ sender, System::EventArgs^ e) {
 
 }
+private: System::Void Graph_Panel_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
+	if (miGrafo != nullptr) {
+		// Le pasamos el Graphics y la etapa actual (page) para que el Grafo 
+		// sepa si debe dibujarse normal o con los colores finales.
+		miGrafo->dibujarGrafo(e->Graphics, page);
+	}
+}
+private: System::Void GraphGeneratorAutomatic_Button__Click(System::Object^ sender, System::EventArgs^ e) {
+	int n;
+	// Validamos la entrada
+	if (Int32::TryParse(NumberofNodes_TextBox->Text, n) && n >= 4 && n <= 12) {
+		miGrafo = gcnew Grafo(n);
+		miGrafo->generarMatrizAleatoria();
+		miGrafo->calcularComponentesConexas(); // Pre-calculamos todo internamente
+
+		page = 0; // Reiniciamos el estado a la fase inicial
+		Testing_Label->Text = "Paso " + page;
+
+		Graph_Panel->Invalidate(); // Forzamos al panel a dibujarse
+	}
+	else {
+		MessageBox::Show("Ingrese un número válido entre 4 y 12.");
+	}
+}
+
 };
 }

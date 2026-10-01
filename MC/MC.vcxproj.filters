@@ -29,5 +29,17 @@
     <ClInclude Include="algoritmo.h">
       <Filter>Archivos de origen</Filter>
     </ClInclude>
+    <ClInclude Include="x64\Grafo.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="x64\Arista.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="x64\Figura.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="x64\Circulo.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
