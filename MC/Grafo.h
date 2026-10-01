@@ -21,9 +21,7 @@ private:
     vector<Arista*> aristas;
     vector<vector<int>> componentesFinales;
 
-    // ============================================================
-    // MÉTODOS MATEMÁTICOS PRIVADOS (Antes estaban en algoritmo.h)
-    // ============================================================
+
     int cantidadUnos(const vector<int>& fila) {
         return count(fila.begin(), fila.end(), 1);
     }
@@ -102,13 +100,10 @@ private:
     }
 
 public:
-    // ============================================================
-    // CONSTRUCTOR Y MÉTODOS PÚBLICOS
-    // ============================================================
     Grafo(int n, int panelWidth, int panelHeight) {
         this->numNodos = n;
         matrizAdyacencia = Matriz(n, vector<int>(n, 0));
-
+        srand((unsigned)time(0));
         int radioGrafo = (panelWidth < panelHeight ? panelWidth : panelHeight) / 2 - 40;
         int centroX = panelWidth / 2;
         int centroY = panelHeight / 2;
@@ -128,12 +123,10 @@ public:
     }
 
     void generarMatrizAleatoria() {
-        srand((unsigned)time(0));
-        int probabilidad = (rand() % 26) + 10;
-
+        
+        int probabilidad = (rand() % 26) + 10; //(rand() % (MAX - MIN + 1)) + MIN y aca es 35 y 10
         for (int i = 0; i < numNodos; i++) {
             for (int j = i + 1; j < numNodos; j++) {
-                // Usa la probabilidad dinámica calculada arriba
                 if (rand() % 100 < probabilidad) {
                     agregarArista(i, j);
                 }
