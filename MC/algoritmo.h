@@ -19,20 +19,20 @@ void mostrarMatriz(const Matriz& m, const string& titulo);
 // FUNCIONES AUXILIARES (se reutilizan en varios pasos)
 // ============================================================
 
-int cantidadUnos(const vector<int>& fila) {
+inline int cantidadUnos(const vector<int>& fila) {
     return count(fila.begin(), fila.end(), 1);
 }
 
-int primeraColumna(const vector<int>& fila) {
+inline int primeraColumna(const vector<int>& fila) {
     return find(fila.begin(), fila.end(), 1) - fila.begin();
 }
 
-bool filaLlena(const vector<int>& fila) {
+inline bool filaLlena(const vector<int>& fila) {
     return cantidadUnos(fila) == (int)fila.size();
 }
 
 // ¿El cuadrado [inicio..fin] x [inicio..fin] está lleno de 1s?
-bool bloqueCompleto(const Matriz& m, int inicio, int fin) {
+inline bool bloqueCompleto(const Matriz& m, int inicio, int fin) {
     for (int f = inicio; f <= fin; f++)
         for (int c = inicio; c <= fin; c++)
             if (m[f][c] != 1) return false;
@@ -43,7 +43,7 @@ bool bloqueCompleto(const Matriz& m, int inicio, int fin) {
 // ============================================================
 // PASO 1: MATRIZ DE CAMINOS
 // ============================================================
-Matriz construirMatrizCaminos(const Matriz& ady) {
+inline Matriz construirMatrizCaminos(const Matriz& ady) {
     int n = ady.size();
     // Copiamos la matriz de adyacencia
     Matriz caminos = ady;
@@ -89,13 +89,13 @@ Matriz construirMatrizCaminos(const Matriz& ady) {
 // más 1s primero, luego menor primera columna, luego fila igual (mismos alcanzables), luego menor nodo
 // ============================================================
 
-vector<int> obtenerOrdenFilas(const Matriz& caminos) {
+inline vector<int> obtenerOrdenFilas(const Matriz& caminos) {
     int n = caminos.size();
     vector<int> orden(n);
     for (int i = 0; i < n; i++) orden[i] = i;
 
     sort(orden.begin(), orden.end(), [&](int a, int b) { // a y b son indices de filas porque [&] permite acceder a la variable caminos
-        int unosA = cantidadUnos(caminos[a]);
+        int unosA =     cantidadUnos(caminos[a]);
         int unosB = cantidadUnos(caminos[b]);
         if (unosA != unosB) return unosA > unosB;
 
@@ -116,7 +116,7 @@ vector<int> obtenerOrdenFilas(const Matriz& caminos) {
 // PASO 3: ORDENAR FILAS Y COLUMNAS
 // ============================================================
 
-Matriz reordenarMatriz(const Matriz& m, const vector<int>& orden) {
+inline Matriz reordenarMatriz(const Matriz& m, const vector<int>& orden) {
     int n = orden.size();
     Matriz nueva(n, vector<int>(n));
 
@@ -132,7 +132,7 @@ Matriz reordenarMatriz(const Matriz& m, const vector<int>& orden) {
 // PASO 4: BLOQUES CUADRADOS Y COMPONENTES
 // ============================================================
 
-vector<vector<int>> obtenerBloques(const Matriz& ordenada, const vector<int>& orden) {
+inline vector<vector<int>> obtenerBloques(const Matriz& ordenada, const vector<int>& orden) {
     int n = ordenada.size();
     vector<vector<int>> bloques;
 
@@ -153,11 +153,11 @@ vector<vector<int>> obtenerBloques(const Matriz& ordenada, const vector<int>& or
 // IMPRESIÓN (solo para probar en consola)
 // ============================================================
 
-void mostrarTitulo(const string& titulo) {
+inline void mostrarTitulo(const string& titulo) {
     cout << "\n" << string(60, '=') << "\n" << titulo << "\n" << string(60, '=') << "\n";
 }
 
-void mostrarMatriz(const Matriz& m, const string& titulo) {
+inline void mostrarMatriz(const Matriz& m, const string& titulo) {
     int n = m.size();
     mostrarTitulo(titulo);
 
@@ -173,7 +173,7 @@ void mostrarMatriz(const Matriz& m, const string& titulo) {
 }
 
 // Devuelve los nodos en base 1 separados por 'sep': "1, 2, 4"
-string nodosATexto(const vector<int>& nodos, const string& sep) {
+inline string nodosATexto(const vector<int>& nodos, const string& sep) {
     string texto;
     for (size_t i = 0; i < nodos.size(); i++) {
         if (i > 0) texto += sep;

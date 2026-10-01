@@ -135,6 +135,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="algoritmo.h" />
+    <ClInclude Include="Arista.h" />
+    <ClInclude Include="Circulo.h" />
+    <ClInclude Include="Figura.h" />
+    <ClInclude Include="Grafo.h" />
     <ClInclude Include="MainPanel.h">
       <FileType>CppForm</FileType>
     </ClInclude>
