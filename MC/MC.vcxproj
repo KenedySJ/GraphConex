@@ -131,7 +131,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainPanel.cpp" />
-    <ClCompile Include="MatrizForm.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -140,12 +139,11 @@
     <ClInclude Include="Circulo.h" />
     <ClInclude Include="Figura.h" />
     <ClInclude Include="Grafo.h" />
+    <ClInclude Include="LectorCSV.h" />
     <ClInclude Include="MainPanel.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="MatrizForm.h">
-      <FileType>CppForm</FileType>
-    </ClInclude>
+    <ClInclude Include="MatrizVisual.h" />
     <ClInclude Include="x64\Arista.h" />
     <ClInclude Include="x64\Circulo.h" />
     <ClInclude Include="x64\Figura.h" />

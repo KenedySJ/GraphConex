@@ -1,8 +1,8 @@
 ﻿#pragma once
+// [CAMBIO GRANDE] La matriz ahora vive en este formulario: se eliminan MatrizForm.h y la salida por consola
 #include "Grafo.h"
-#include "algoritmo.h" 
-#include "MatrizForm.h" // NUEVO: Incluimos el nuevo formulario de la tabla interactiva
-#include <iostream>
+#include "MatrizVisual.h"
+#include "LectorCSV.h"
 
 namespace MC {
 
@@ -21,6 +21,7 @@ namespace MC {
 	private: System::Windows::Forms::PictureBox^ pb1Logo;
 
 		   Grafo* miGrafo = nullptr;
+		   MatrizVisual* miMatriz = nullptr;
 
 	public:
 		MainPanel(void)
@@ -29,6 +30,7 @@ namespace MC {
 			pb1Logo->Image = Image::FromFile("graphconex.jpg");
 			pb1Logo->SizeMode = PictureBoxSizeMode::StretchImage;
 			Testing_Label->Text = "Ingrese nodos y genere el grafo";
+			miMatriz = new MatrizVisual();
 		}
 
 	protected:
@@ -42,6 +44,7 @@ namespace MC {
 				delete miGrafo;
 				miGrafo = nullptr;
 			}
+			delete miMatriz;
 		}
 
 	private: System::Windows::Forms::GroupBox^ Buttons;
@@ -59,6 +62,10 @@ namespace MC {
 	private: System::Windows::Forms::Button^ GraphGeneratorAutomatic_Button_;
 	private: System::Windows::Forms::Label^ Testing_Label;
 	private: System::Windows::Forms::Timer^ Page_Timer;
+	private: System::Windows::Forms::Panel^ Matrix_Panel; // [CAMBIO GRANDE] Matriz al costado del grafo
+	private: System::Windows::Forms::Label^ Description_Label;
+	private: System::Windows::Forms::Button^ GraphGeneratorCSV_Button;
+	private: System::Windows::Forms::OpenFileDialog^ CSV_Dialog;
 	private: System::ComponentModel::IContainer^ components;
 
 #pragma region Windows Form Designer generated code
@@ -81,6 +88,10 @@ namespace MC {
 			   this->NumberofNodes_Label = (gcnew System::Windows::Forms::Label());
 			   this->Page_Timer = (gcnew System::Windows::Forms::Timer(this->components));
 			   this->pb1Logo = (gcnew System::Windows::Forms::PictureBox());
+			   this->Matrix_Panel = (gcnew System::Windows::Forms::Panel());
+			   this->Description_Label = (gcnew System::Windows::Forms::Label());
+			   this->GraphGeneratorCSV_Button = (gcnew System::Windows::Forms::Button());
+			   this->CSV_Dialog = (gcnew System::Windows::Forms::OpenFileDialog());
 			   this->Buttons->SuspendLayout();
 			   this->Graph_Panel->SuspendLayout();
 			   this->Inputs_Panel->SuspendLayout();
@@ -188,6 +199,7 @@ namespace MC {
 			   // 
 			   // Inputs_Panel
 			   // 
+			   this->Inputs_Panel->Controls->Add(this->GraphGeneratorCSV_Button);
 			   this->Inputs_Panel->Controls->Add(this->GraphGeneratorManual_Botton);
 			   this->Inputs_Panel->Controls->Add(this->GraphGeneratorAutomatic_Button_);
 			   this->Inputs_Panel->Controls->Add(this->GrafoGenerator_Label);
@@ -251,9 +263,44 @@ namespace MC {
 			   this->NumberofNodes_Label->TabIndex = 0;
 			   this->NumberofNodes_Label->Text = L"Cantidad de Nodos (4-12):";
 			   // 
+			   // GraphGeneratorCSV_Button
+			   // 
+			   this->GraphGeneratorCSV_Button->Cursor = System::Windows::Forms::Cursors::Hand;
+			   this->GraphGeneratorCSV_Button->Location = System::Drawing::Point(8, 251);
+			   this->GraphGeneratorCSV_Button->Margin = System::Windows::Forms::Padding(4, 5, 4, 5);
+			   this->GraphGeneratorCSV_Button->Name = L"GraphGeneratorCSV_Button";
+			   this->GraphGeneratorCSV_Button->Size = System::Drawing::Size(216, 42);
+			   this->GraphGeneratorCSV_Button->TabIndex = 5;
+			   this->GraphGeneratorCSV_Button->Text = L"Cargar CSV";
+			   this->GraphGeneratorCSV_Button->UseVisualStyleBackColor = true;
+			   this->GraphGeneratorCSV_Button->Click += gcnew System::EventHandler(this, &MainPanel::GraphGeneratorCSV_Button_Click);
+			   // 
+			   // Matrix_Panel
+			   // 
+			   this->Matrix_Panel->BackColor = System::Drawing::Color::White;
+			   this->Matrix_Panel->Location = System::Drawing::Point(1010, 52);
+			   this->Matrix_Panel->Margin = System::Windows::Forms::Padding(4, 5, 4, 5);
+			   this->Matrix_Panel->Name = L"Matrix_Panel";
+			   this->Matrix_Panel->Size = System::Drawing::Size(440, 487);
+			   this->Matrix_Panel->TabIndex = 4;
+			   this->Matrix_Panel->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &MainPanel::Matrix_Panel_Paint);
+			   this->Matrix_Panel->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &MainPanel::Matrix_Panel_MouseClick);
+			   // 
+			   // Description_Label
+			   // 
+			   this->Description_Label->Location = System::Drawing::Point(1010, 570);
+			   this->Description_Label->Name = L"Description_Label";
+			   this->Description_Label->Size = System::Drawing::Size(440, 154);
+			   this->Description_Label->TabIndex = 5;
+			   // 
+			   // CSV_Dialog
+			   // 
+			   this->CSV_Dialog->Filter = L"Archivos CSV (*.csv)|*.csv";
+			   this->CSV_Dialog->Title = L"Cargar grafo desde CSV";
+			   // 
 			   // Page_Timer
 			   // 
-			   this->Page_Timer->Interval = 1500;
+			   this->Page_Timer->Interval = 800;
 			   this->Page_Timer->Tick += gcnew System::EventHandler(this, &MainPanel::timer1_Tick);
 			   // 
 			   // pb1Logo
@@ -271,7 +318,9 @@ namespace MC {
 			   this->AutoScaleDimensions = System::Drawing::SizeF(9, 20);
 			   this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			   this->BackColor = System::Drawing::Color::LightGray;
-			   this->ClientSize = System::Drawing::Size(1018, 798);
+			   this->ClientSize = System::Drawing::Size(1478, 798);
+			   this->Controls->Add(this->Description_Label);
+			   this->Controls->Add(this->Matrix_Panel);
 			   this->Controls->Add(this->pb1Logo);
 			   this->Controls->Add(this->Inputs_Panel);
 			   this->Controls->Add(this->Graph_Panel);
@@ -290,24 +339,41 @@ namespace MC {
 		   }
 #pragma endregion
 
+	// [CAMBIO GRANDE] Cada paso se ejecuta al momento: el grafo solo cambia al llegar al ultimo paso
 	private: void ActualizarVistaPasoAPaso() {
+		miGrafo->ejecutarPaso(page);
+		Algoritmo& algoritmo = miGrafo->getAlgoritmo();
+
 		this->Previous->Enabled = (page > 0);
 		this->Next->Enabled = (page < max_pages);
-
-		if (page == 0) {
-			Testing_Label->Text = "Paso 0: Grafo Inicial (Matriz de Adyacencia)";
-		}
-		else if (page == 1) {
-			Testing_Label->Text = "Paso 1: Construyendo Matriz de Caminos";
-		}
-		else if (page == 2) {
-			Testing_Label->Text = "Paso 2: Reordenando Filas y Columnas";
-		}
-		else if (page == 3) {
-			Testing_Label->Text = "Paso 3: Componentes Conexas Encontradas";
-		}
+		Testing_Label->Text = String::Format(L"Paso {0} de {1}", page + 1, max_pages + 1);
+		Description_Label->Text = String::Format(L"{0}\r\n\r\n{1}", gcnew String(algoritmo.getTitulo().c_str()), gcnew String(algoritmo.getMensaje().c_str()));
 
 		Graph_Panel->Invalidate();
+		Matrix_Panel->Invalidate();
+	}
+
+	private: void ReiniciarSimulacion() {
+		page = 0;
+		max_pages = miGrafo->totalPasos() - 1;
+		Page_Timer->Stop();
+		this->Start_Pause->Text = L"\u23F5";
+		ActualizarVistaPasoAPaso();
+	}
+
+	private: void NuevoGrafo(int n) {
+		if (miGrafo != nullptr) { delete miGrafo; }
+		miGrafo = new Grafo(n, Graph_Panel->Width, Graph_Panel->Height);
+	}
+
+	private: int LeerCantidadNodos() {
+		int n;
+		if (Int32::TryParse(NumberofNodes_TextBox->Text, n) && n >= MIN_NODOS && n <= MAX_NODOS) {
+			return n;
+		}
+		MessageBox::Show("Por favor, ingrese un número entero válido entre 4 y 12.",
+			"Error de Validación", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		return 0;
 	}
 
 	private: System::Void Start_Pause_Click(System::Object^ sender, System::EventArgs^ e) {
@@ -364,146 +430,57 @@ namespace MC {
 
 	private: System::Void Graph_Panel_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
 		if (miGrafo != nullptr) {
-			miGrafo->dibujar(e->Graphics, page);
+			miGrafo->dibujar(e->Graphics, page == max_pages);
+		}
+	}
+
+	private: System::Void Matrix_Panel_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
+		if (miGrafo != nullptr) {
+			miMatriz->dibujar(e->Graphics, miGrafo, Matrix_Panel->Width);
+		}
+	}
+
+	// Solo se edita en el paso 0: despues la matriz es el resultado del algoritmo
+	private: System::Void Matrix_Panel_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		int fila, columna;
+		if (miGrafo == nullptr || page != 0) return;
+		if (miMatriz->celdaEn(e->X, e->Y, miGrafo->getNumNodos(), fila, columna)) {
+			miGrafo->alternarArista(fila, columna);
+			ReiniciarSimulacion();
 		}
 	}
 
 	private: System::Void GraphGeneratorManual_Botton_Click(System::Object^ sender, System::EventArgs^ e) {
-		int n;
-		if (Int32::TryParse(NumberofNodes_TextBox->Text, n) && n >= 4 && n <= 12) {
-			MatrizForm^ ventanaMatriz = gcnew MatrizForm(n);
-			ventanaMatriz->OnMatrizConfirmada += gcnew MatrizConfirmadaEventHandler(this, &MainPanel::RecibirMatrizManual);
-			ventanaMatriz->ShowDialog();
-		}
-		else {
-			MessageBox::Show("Por favor, ingrese un número entero válido entre 4 y 12.",
-				"Error de Validación", MessageBoxButtons::OK, MessageBoxIcon::Warning);
-		}
-	}
+		int n = LeerCantidadNodos();
+		if (n == 0) return;
 
-	private: void RecibirMatrizManual(std::vector<std::vector<int>> matrizAdy) {
-		int n = matrizAdy.size();
-
-		if (miGrafo != nullptr) { delete miGrafo; }
-
-		// 1. Se crea la base visual del panel
-		miGrafo = new Grafo(n, Graph_Panel->Width, Graph_Panel->Height);
-
-		// 2. Transferimos la información creada manualmente al Grafo visual
-		for (int i = 0; i < n; i++) {
-			for (int j = i + 1; j < n; j++) {
-				if (matrizAdy[i][j] == 1) {
-					// Gracias a la lógica espejo en MatrizForm, sabemos que si [i][j] es 1, [j][i] también lo es
-					miGrafo->agregarArista(i, j);
-				}
-			}
-		}
-
-		// 3. Calculamos la parte visual en Grafo.h
-		miGrafo->calcularComponentesConexas();
-
-		// 4. Imprimimos el proceso matemático paso a paso en la consola
-		std::cout << "\n============================================================\n";
-		std::cout << "INICIO DE GENERACION MANUAL - COMPONENTES CONEXAS";
-		std::cout << "\n============================================================\n";
-		mostrarMatriz(matrizAdy, "MATRIZ DE ADYACENCIA INICIAL");
-
-		Matriz caminos = construirMatrizCaminos(matrizAdy);
-		mostrarMatriz(caminos, "PASO 1: MATRIZ DE CAMINOS FINAL");
-
-		std::vector<int> orden = obtenerOrdenFilas(caminos);
-		mostrarTitulo("PASO 2: ORDEN DE LAS FILAS");
-		for (int i = 0; i < (int)caminos.size(); i++) {
-			std::cout << "Nodo " << i + 1 << ": " << cantidadUnos(caminos[i])
-				<< " unos | primer 1 en columna "
-				<< primeraColumna(caminos[i]) + 1 << "\n";
-		}
-		std::cout << "\nOrden de las filas: [" << nodosATexto(orden, ", ") << "]\n";
-
-		Matriz ordenada = reordenarMatriz(caminos, orden);
-		mostrarMatriz(ordenada, "PASO 3: FILAS Y COLUMNAS ORDENADAS");
-
-		std::vector<std::vector<int>> bloques = obtenerBloques(ordenada, orden);
-		mostrarTitulo("PASO 4: BLOQUES CUADRADOS");
-		for (size_t i = 0; i < bloques.size(); i++) {
-			std::cout << "Bloque " << i + 1 << ": " << nodosATexto(bloques[i], "; ")
-				<< " (" << bloques[i].size() << "x" << bloques[i].size() << ")\n";
-		}
-
-		mostrarTitulo("RESULTADO FINAL");
-		std::cout << "Cantidad de componentes conexas: " << bloques.size() << "\n";
-		for (size_t i = 0; i < bloques.size(); i++) {
-			std::cout << "Componente " << i + 1 << ": { " << nodosATexto(bloques[i], ", ") << " }\n";
-		}
-		std::cout << "\n*** REVISE EL PANEL GRAFICO PARA VER LA ANIMACION ***\n\n";
-
-		// Reiniciamos UI y temporizador
-		page = 0;
-		Page_Timer->Stop();
-		this->Start_Pause->Text = L"\u23F5";
-		ActualizarVistaPasoAPaso();
+		NuevoGrafo(n);
+		ReiniciarSimulacion();
 	}
 
 	private: System::Void GraphGeneratorAutomatic_Button__Click(System::Object^ sender, System::EventArgs^ e) {
-		int n;
-		if (Int32::TryParse(NumberofNodes_TextBox->Text, n) && n >= 4 && n <= 12) {
-			if (miGrafo != nullptr) { delete miGrafo; }
+		int n = LeerCantidadNodos();
+		if (n == 0) return;
 
-			miGrafo = new Grafo(n, Graph_Panel->Width, Graph_Panel->Height);
-			Matriz matrizAdy = generarMatrizAleatoria(n);
+		NuevoGrafo(n);
+		miGrafo->generarMatrizAleatoria();
+		ReiniciarSimulacion();
+	}
 
-			for (int i = 0; i < n; i++) {
-				for (int j = i + 1; j < n; j++) {
-					if (matrizAdy[i][j] == 1) {
-						miGrafo->agregarArista(i, j);
-					}
-				}
-			}
+	private: System::Void GraphGeneratorCSV_Button_Click(System::Object^ sender, System::EventArgs^ e) {
+		if (CSV_Dialog->ShowDialog() != System::Windows::Forms::DialogResult::OK) return;
 
-			miGrafo->calcularComponentesConexas();
-
-			std::cout << "\n============================================================\n";
-			std::cout << "INICIO DE GENERACION AUTOMATICA - COMPONENTES CONEXAS";
-			std::cout << "\n============================================================\n";
-			mostrarMatriz(matrizAdy, "MATRIZ DE ADYACENCIA INICIAL");
-
-			Matriz caminos = construirMatrizCaminos(matrizAdy);
-			mostrarMatriz(caminos, "PASO 1: MATRIZ DE CAMINOS FINAL");
-
-			std::vector<int> orden = obtenerOrdenFilas(caminos);
-			mostrarTitulo("PASO 2: ORDEN DE LAS FILAS");
-			for (int i = 0; i < (int)caminos.size(); i++) {
-				std::cout << "Nodo " << i + 1 << ": " << cantidadUnos(caminos[i])
-					<< " unos | primer 1 en columna "
-					<< primeraColumna(caminos[i]) + 1 << "\n";
-			}
-			std::cout << "\nOrden de las filas: [" << nodosATexto(orden, ", ") << "]\n";
-
-			Matriz ordenada = reordenarMatriz(caminos, orden);
-			mostrarMatriz(ordenada, "PASO 3: FILAS Y COLUMNAS ORDENADAS");
-
-			std::vector<std::vector<int>> bloques = obtenerBloques(ordenada, orden);
-			mostrarTitulo("PASO 4: BLOQUES CUADRADOS");
-			for (size_t i = 0; i < bloques.size(); i++) {
-				std::cout << "Bloque " << i + 1 << ": " << nodosATexto(bloques[i], "; ")
-					<< " (" << bloques[i].size() << "x" << bloques[i].size() << ")\n";
-			}
-
-			mostrarTitulo("RESULTADO FINAL");
-			std::cout << "Cantidad de componentes conexas: " << bloques.size() << "\n";
-			for (size_t i = 0; i < bloques.size(); i++) {
-				std::cout << "Componente " << i + 1 << ": { " << nodosATexto(bloques[i], ", ") << " }\n";
-			}
-			std::cout << "\n*** REVISE EL PANEL GRAFICO PARA VER LA ANIMACION ***\n\n";
-
-			page = 0;
-			Page_Timer->Stop();
-			this->Start_Pause->Text = L"\u23F5";
-			ActualizarVistaPasoAPaso();
+		try {
+			LectorCSV lector;
+			Matriz matriz = lector.leer(CSV_Dialog->FileName);
+			int n = matriz.size();
+			NumberofNodes_TextBox->Text = n.ToString();
+			NuevoGrafo(n);
+			miGrafo->cargarMatriz(matriz);
+			ReiniciarSimulacion();
 		}
-		else {
-			MessageBox::Show("Por favor, ingrese un número entero válido entre 4 y 12.",
-				"Error de Validación", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		catch (Exception^ ex) {
+			MessageBox::Show(ex->Message, "Error al leer el CSV", MessageBoxButtons::OK, MessageBoxIcon::Warning);
 		}
 	}
 };

@@ -1,269 +1,244 @@
-#pragma once
+﻿#pragma once
+// [CAMBIO GRANDE] Las funciones sueltas pasan a ser la clase Algoritmo, que ejecuta el proceso hasta el paso pedido
 
-// ============================================================
-// PROYECTO 1 - COMPONENTES CONEXAS
-// Matriz de Adyacencia + Matriz de Caminos
-// ============================================================
-
-#include <iostream>
-#include <iomanip>
 #include <vector>
 #include <string>
 #include <algorithm>
-#include <cstdlib>
-#include <ctime>
+#include <numeric>
 using namespace std;
 
-// Esta linea permite usar "vector<vector<int>>" como "Matriz"
 using Matriz = vector<vector<int>>;
 
-// ============================================================
-// CONSTRUCCIÓN DE LA MATRIZ DE ADYACENCIA
-// ============================================================
+const int MIN_NODOS = 4;
+const int MAX_NODOS = 12;
 
-// Matriz n x n llena de ceros (grafo sin aristas)
-inline Matriz crearMatrizVacia(int n) {
-    return Matriz(n, vector<int>(n, 0));
-}
+class Algoritmo {
+private:
+    int n;
+    int contador;
+    int objetivo;
+    Matriz vista;
+    Matriz nuevas;
+    vector<int> orden;
+    vector<int> etiquetas;
+    vector<vector<int>> bloques;
+    int pivote, origen, compuerta, ventanaInicio, ventanaFin, malFila, malColumna;
+    bool resumenFilas;
+    wstring titulo;
+    wstring mensaje;
 
-// Grafo no dirigido: si a-b existe, se marca [a][b] y [b][a]
-inline void agregarArista(Matriz& m, int a, int b) {
-    if (a == b) return;          // sin lazos
-    m[a][b] = 1;
-    m[b][a] = 1;
-}
-
-inline Matriz generarMatrizAleatoria(int n) {
-    Matriz m = crearMatrizVacia(n);
-    for (int i = 0; i < n; i++)
-        for (int j = i + 1; j < n; j++)
-            if (rand() % 100 < 30)
-                agregarArista(m, i, j);
-    return m;
-}
-
-inline void mostrarMatriz(const Matriz& m, const string& titulo);
-
-// ============================================================
-// FUNCIONES AUXILIARES (se reutilizan en varios pasos)
-// ============================================================
-
-inline int cantidadUnos(const vector<int>& fila) {
-    return count(fila.begin(), fila.end(), 1);
-}
-
-inline int primeraColumna(const vector<int>& fila) {
-    return find(fila.begin(), fila.end(), 1) - fila.begin();
-}
-
-inline bool filaLlena(const vector<int>& fila) {
-    return cantidadUnos(fila) == (int)fila.size();
-}
-
-// ¿El cuadrado [inicio..fin] x [inicio..fin] está lleno de 1s?
-inline bool bloqueCompleto(const Matriz& m, int inicio, int fin) {
-    for (int f = inicio; f <= fin; f++)
-        for (int c = inicio; c <= fin; c++)
-            if (m[f][c] != 1) return false;
-    return true;
-}
-
-
-// ============================================================
-// PASO 1: MATRIZ DE CAMINOS
-// ============================================================
-inline Matriz construirMatrizCaminos(const Matriz& ady) {
-    int n = ady.size();
-    // Copiamos la matriz de adyacencia
-    Matriz caminos = ady;
-    // Todo nodo puede llegar a sí mismo
-    for (int i = 0; i < n; i++) {
-        if (caminos[i][i] == 0) {
-            caminos[i][i] = 1;
-        }
+    wstring nodoATexto(int nodo) {
+        return to_wstring(nodo + 1);
     }
-    mostrarMatriz(
-        caminos,
-        "MATRIZ DE CAMINOS (Diagonal de 1's)"
-    );
-    // k = nodo intermedio
-    for (int k = 0; k < n; k++) {
-        // i = nodo origen
-        for (int i = 0; i < n; i++) {
-            // Si i no puede llegar a k,
-            // no podemos usar k como intermediario.
-            if (caminos[i][k] == 0)
-                continue;
-            // j = nodo destino
-            for (int j = 0; j < n; j++) {
-                // Si k puede llegar a j,
-                // entonces i también puede llegar a j.
-                if (caminos[k][j] == 1 &&
-                    caminos[i][j] == 0) {
 
-                    caminos[i][j] = 1;
-                    mostrarMatriz(
-                        caminos,
-                        "PASO 1: MATRIZ DE CAMINOS (cambio)"
-                    );
+    wstring nodosATexto(const vector<int>& nodos, const wstring& sep) {
+        wstring texto;
+        for (size_t i = 0; i < nodos.size(); i++) {
+            if (i > 0) texto += sep;
+            texto += nodoATexto(nodos[i]);
+        }
+        return texto;
+    }
+
+    vector<int> nodosEnRango(int inicio, int fin) {
+        return vector<int>(orden.begin() + inicio, orden.begin() + fin);
+    }
+
+    void limpiarMarcas() {
+        for (vector<int>& fila : nuevas) fill(fila.begin(), fila.end(), 0);
+        pivote = origen = ventanaInicio = ventanaFin = malFila = malColumna = -1;
+        compuerta = 0;
+        resumenFilas = false;
+    }
+
+    // Cada paso cuenta uno; si es el pedido se detiene con las marcas intactas, si no las limpia para el siguiente
+    bool paso(const wstring& nuevoTitulo, const wstring& texto) {
+        titulo = nuevoTitulo;
+        mensaje = texto;
+        if (contador++ == objetivo) return true;
+        limpiarMarcas();
+        return false;
+    }
+
+    bool bloqueCompleto(const Matriz& m, int inicio, int fin) {
+        for (int f = inicio; f <= fin; f++)
+            for (int c = inicio; c <= fin; c++)
+                if (m[f][c] != 1) {
+                    malFila = f;
+                    malColumna = c;
+                    return false;
                 }
+        return true;
+    }
+
+    bool construirMatrizCaminos() {
+        int agregadas = 0;
+        for (int i = 0; i < n; i++) {
+            if (vista[i][i] == 0) {
+                vista[i][i] = 1;
+                nuevas[i][i] = 1;
+                agregadas++;
             }
         }
+        wstring texto = L"Todo nodo puede llegar a sí mismo, así que se pone 1 en la diagonal";
+        if (agregadas > 0) texto += L" (" + to_wstring(agregadas) + L" celdas nuevas).";
+        else texto += L". La diagonal ya tenía todos sus 1s.";
+        if (paso(L"Matriz de caminos (en construcción)", texto)) return true;
+
+        for (int k = 0; k < n; k++) {
+            for (int i = 0; i < n; i++) {
+                pivote = k;
+                origen = i;
+                compuerta = (vista[i][k] == 1) ? 1 : 2;
+                if (vista[i][k] == 0) {
+                    texto = L"El nodo " + nodoATexto(i) + L" no llega a " + nodoATexto(k) + L" (celda (" + nodoATexto(i) + L"," + nodoATexto(k)
+                        + L") = 0). Sin ese camino, " + nodoATexto(k) + L" no sirve como intermediario para " + nodoATexto(i) + L": se salta la fila.";
+                    if (paso(L"Matriz de caminos (en construcción)", texto)) return true;
+                    continue;
+                }
+                vector<int> alcanzables;
+                wstring celdasNuevas;
+                for (int j = 0; j < n; j++) {
+                    if (vista[k][j] == 1) alcanzables.push_back(j);
+                    if (vista[k][j] == 1 && vista[i][j] == 0) {
+                        vista[i][j] = 1;
+                        nuevas[i][j] = 1;
+                        if (!celdasNuevas.empty()) celdasNuevas += L", ";
+                        celdasNuevas += L"(" + nodoATexto(i) + L"," + nodoATexto(j) + L")";
+                    }
+                }
+                if (i == k) {
+                    texto = L"i = k (nodo " + nodoATexto(k) + L"): es el mismo nodo, no hay nada nuevo que propagar.";
+                }
+                else {
+                    texto = nodoATexto(i) + L" llega a " + nodoATexto(k) + L", y " + nodoATexto(k) + L" llega a {" + nodosATexto(alcanzables, L", ")
+                        + L"}. Por transitividad, " + nodoATexto(i) + L" también llega a todos ellos. ";
+                    if (celdasNuevas.empty()) texto += L"Pero todo eso ya estaba en la fila " + nodoATexto(i) + L": no cambia nada.";
+                    else texto += L"Celdas nuevas: " + celdasNuevas + L".";
+                }
+                if (paso(L"Matriz de caminos (en construcción)", texto)) return true;
+            }
+        }
+        return paso(L"Matriz de caminos (final)", L"Matriz de caminos final: un 1 en (i,j) indica que existe algún camino, directo o con intermediarios, de i a j. "
+            L"Siguiente: ordenar los nodos para agrupar los que se alcanzan entre sí.");
     }
 
-    return caminos;
-}
-// ============================================================
-// PASO 2: ORDEN DE LAS FILAS
-// más 1s primero, luego menor primera columna, luego fila igual (mismos alcanzables), luego menor nodo
-// ============================================================
+    bool obtenerOrdenFilas() {
+        sort(orden.begin(), orden.end(), [&](int a, int b) {
+            int unosA = cantidadUnos(vista[a]);
+            int unosB = cantidadUnos(vista[b]);
+            if (unosA != unosB) return unosA > unosB;
 
-inline vector<int> obtenerOrdenFilas(const Matriz& caminos) {
-    int n = caminos.size();
-    vector<int> orden(n);
-    for (int i = 0; i < n; i++) orden[i] = i;
+            int colA = primeraColumna(vista[a]);
+            int colB = primeraColumna(vista[b]);
+            if (colA != colB) return colA < colB;
 
-    sort(orden.begin(), orden.end(), [&](int a, int b) { // a y b son indices de filas porque [&] permite acceder a la variable caminos
-        int unosA = cantidadUnos(caminos[a]);
-        int unosB = cantidadUnos(caminos[b]);
-        if (unosA != unosB) return unosA > unosB;
+            // Nodos de la misma componente tienen filas idénticas: así quedan juntos
+            if (vista[a] != vista[b]) return vista[a] > vista[b];
 
-        int colA = primeraColumna(caminos[a]);
-        int colB = primeraColumna(caminos[b]);
-        if (colA != colB) return colA < colB;
-
-        // Nodos de la misma componente tienen filas idénticas: así quedan juntos
-        if (caminos[a] != caminos[b]) return caminos[a] > caminos[b];
-
-        return a < b;
-        });
-    return orden;
-}
-
-
-// ============================================================
-// PASO 3: ORDENAR FILAS Y COLUMNAS
-// ============================================================
-
-inline Matriz reordenarMatriz(const Matriz& m, const vector<int>& orden) {
-    int n = orden.size();
-    Matriz nueva(n, vector<int>(n));
-
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++)
-            nueva[i][j] = m[orden[i]][orden[j]];
-
-    return nueva;
-}
-
-
-// ============================================================
-// PASO 4: BLOQUES CUADRADOS Y COMPONENTES
-// ============================================================
-
-inline vector<vector<int>> obtenerBloques(const Matriz& ordenada, const vector<int>& orden) {
-    int n = ordenada.size();
-    vector<vector<int>> bloques;
-
-    int inicio = 0;
-    while (inicio < n) {
-        int fin = inicio + 1;
-        while (fin < n && bloqueCompleto(ordenada, inicio, fin))
-            fin++;
-
-        bloques.push_back(vector<int>(orden.begin() + inicio, orden.begin() + fin));
-        inicio = fin; // el siguiente cuadrado empieza en (fin, fin), o sea i+n+1
+            return a < b;
+            });
+        resumenFilas = true;
+        return paso(L"Filas de la matriz de caminos", L"Cada fila se resume con dos datos: cantidad de unos y primera columna con 1. Se ordena por más unos, luego menor primera columna, "
+            L"luego fila idéntica (mismos alcanzables) y al final menor nodo. Orden resultante: [" + nodosATexto(orden, L", ") + L"].");
     }
-    return bloques;
-}
 
-
-// ============================================================
-// IMPRESIÓN (solo para probar en consola)
-// ============================================================
-
-inline void mostrarTitulo(const string& titulo) {
-    cout << "\n" << string(60, '=') << "\n" << titulo << "\n" << string(60, '=') << "\n";
-}
-
-inline void mostrarMatriz(const Matriz& m, const string& titulo) {
-    int n = m.size();
-    mostrarTitulo(titulo);
-
-    cout << "   ";
-    for (int i = 0; i < n; i++) cout << setw(2) << i + 1 << " ";
-    cout << "\n";
-
-    for (int i = 0; i < n; i++) {
-        cout << setw(2) << i + 1 << "  ";
-        for (int j = 0; j < n; j++) cout << m[i][j] << "  ";
-        cout << "\n";
+    bool reordenarMatriz() {
+        Matriz nueva(n, vector<int>(n));
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                nueva[i][j] = vista[orden[i]][orden[j]];
+        vista = nueva;
+        etiquetas = orden;
+        return paso(L"Matriz reordenada", L"Se reordenan filas y columnas con ese orden. Los nodos que se alcanzan entre sí quedan formando cuadrados de 1s sobre la diagonal.");
     }
-}
 
-// Devuelve los nodos en base 1 separados por 'sep': "1, 2, 4"
-inline string nodosATexto(const vector<int>& nodos, const string& sep) {
-    string texto;
-    for (size_t i = 0; i < nodos.size(); i++) {
-        if (i > 0) texto += sep;
-        texto += to_string(nodos[i] + 1);
+    bool obtenerBloques() {
+        int inicio = 0;
+        while (inicio < n) {
+            int fin = inicio + 1;
+            while (fin < n) {
+                bool completo = bloqueCompleto(vista, inicio, fin);
+                ventanaInicio = inicio;
+                ventanaFin = fin;
+                int lado = fin - inicio + 1;
+                wstring texto = L"¿El cuadrado " + to_wstring(lado) + L"x" + to_wstring(lado) + L" (nodos " + nodosATexto(nodosEnRango(inicio, fin + 1), L", ") + L") está lleno de 1s? ";
+                if (completo) texto += L"Sí: el nodo " + nodoATexto(orden[fin]) + L" se une al bloque.";
+                else texto += L"No: hay un 0 en la fila " + nodoATexto(orden[malFila]) + L", columna " + nodoATexto(orden[malColumna]) + L". El nodo " + nodoATexto(orden[fin]) + L" no pertenece a este bloque.";
+                if (paso(L"Buscando cuadrados de 1s", texto)) return true;
+                if (!completo) break;
+                fin++;
+            }
+            bloques.push_back(nodosEnRango(inicio, fin));
+            int lado = fin - inicio;
+            wstring texto = L"Bloque " + to_wstring(bloques.size()) + L": {" + nodosATexto(bloques.back(), L", ") + L"} (" + to_wstring(lado) + L"x" + to_wstring(lado) + L"). ";
+            if (lado == 1) texto += L"Un nodo solo también es una componente. ";
+            if (fin < n) texto += L"El siguiente cuadrado empieza en la posición " + to_wstring(fin + 1) + L" (fila y columna " + to_wstring(fin + 1) + L").";
+            else texto += L"Ya no quedan nodos.";
+            if (paso(L"Buscando cuadrados de 1s", texto)) return true;
+            inicio = fin;
+        }
+        return false;
     }
-    return texto;
-}
 
-/*
-// ============================================================
-// MAIN
-// ============================================================
+public:
+    Algoritmo() : n(0), contador(0), objetivo(-1), resumenFilas(false) {
+        limpiarMarcas();
+    }
 
-Este es un main de ejemplo para probar el algoritmo completo.
-Lo que nos queda por hacer es crear un panel gráfico
-para que el usuario pueda ingresar la matriz de adyacencia
-y ver los resultados paso a paso.
+    int cantidadUnos(const vector<int>& fila) {
+        return count(fila.begin(), fila.end(), 1);
+    }
 
+    int primeraColumna(const vector<int>& fila) {
+        return find(fila.begin(), fila.end(), 1) - fila.begin();
+    }
 
+    // [CAMBIO GRANDE] No se guarda historial: para ir a cualquier paso (incluso hacia atrás) se vuelve a ejecutar el algoritmo desde cero hasta ese paso.
+    // Con n <= 12 son pocos cientos de operaciones, y así no hay que conservar una copia de la matriz por cada paso.
+    void ejecutar(const Matriz& adyacencia, int pasoObjetivo) {
+        n = adyacencia.size();
+        contador = 0;
+        objetivo = pasoObjetivo;
+        vista = adyacencia;
+        nuevas = Matriz(n, vector<int>(n, 0));
+        orden = vector<int>(n);
+        iota(orden.begin(), orden.end(), 0);
+        etiquetas = orden;
+        bloques.clear();
+        limpiarMarcas();
 
-int main() {
+        if (paso(L"Matriz de adyacencia", L"Matriz de adyacencia: un 1 en (i,j) significa que hay una arista dirigida de i hacia j. "
+            L"Haz clic en una celda para cambiarla (la diagonal no se edita) y mira cómo cambia el grafo. Luego avanza con los botones.")
+            || construirMatrizCaminos() || obtenerOrdenFilas() || reordenarMatriz() || obtenerBloques()) return;
 
-    Matriz matrizAdyacencia = {
-    {0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 1},
-    {0, 1, 0, 0, 1},
-    {0, 1, 0, 0, 0},
-    {0, 0, 1, 0, 0},
-    };
+        wstring texto = L"Resultado: " + to_wstring(bloques.size()) + (bloques.size() == 1 ? L" componente conexa. " : L" componentes conexas. ");
+        for (size_t b = 0; b < bloques.size(); b++) {
+            if (b > 0) texto += L"; ";
+            texto += to_wstring(b + 1) + L": {" + nodosATexto(bloques[b], L", ") + L"}";
+        }
+        paso(L"Componentes conexas", texto + L".");
+    }
 
-    mostrarMatriz(matrizAdyacencia, "MATRIZ DE ADYACENCIA");
+    // Ejecuta sobre una copia para no alterar el paso que se está mostrando
+    int contarPasos(const Matriz& adyacencia) {
+        Algoritmo recorrido;
+        recorrido.ejecutar(adyacencia, -1);
+        return recorrido.contador;
+    }
 
-    // Paso 1
-    Matriz caminos = construirMatrizCaminos(matrizAdyacencia);
-    mostrarMatriz(caminos, "PASO 1: MATRIZ DE CAMINOS FINAL");
-
-    // Paso 2
-    vector<int> orden = obtenerOrdenFilas(caminos);
-    mostrarTitulo("PASO 2: ORDEN DE LAS FILAS");
-    for (int i = 0; i < (int)caminos.size(); i++)
-        cout << "Nodo " << i + 1 << ": " << cantidadUnos(caminos[i]) << " unos | primer 1 en columna "
-        << primeraColumna(caminos[i]) + 1 << "\n";
-    cout << "\nOrden de las filas: [" << nodosATexto(orden, ", ") << "]\n";
-
-    // Paso 3
-    Matriz ordenada = reordenarMatriz(caminos, orden);
-    mostrarMatriz(ordenada, "PASO 3: FILAS Y COLUMNAS ORDENADAS");
-
-    // Paso 4
-    vector<vector<int>> bloques = obtenerBloques(ordenada, orden);
-    mostrarTitulo("PASO 4: BLOQUES CUADRADOS");
-    for (size_t i = 0; i < bloques.size(); i++)
-        cout << "Bloque " << i + 1 << ": " << nodosATexto(bloques[i], "; ")
-        << " (" << bloques[i].size() << "x" << bloques[i].size() << ")\n";
-
-    // Todo bloque cuadrado es una componente (incluidos los de 1x1)
-    mostrarTitulo("RESULTADO FINAL");
-    cout << "Cantidad de componentes conexas: " << bloques.size() << "\n";
-    for (size_t i = 0; i < bloques.size(); i++)
-        cout << "Componente " << i + 1 << ": { " << nodosATexto(bloques[i], ", ") << " }\n";
-
-    return 0;
-}
-*/
+    const Matriz& getVista() { return vista; }
+    const Matriz& getNuevas() { return nuevas; }
+    const vector<int>& getEtiquetas() { return etiquetas; }
+    const vector<vector<int>>& getBloques() { return bloques; }
+    int getPivote() { return pivote; }
+    int getOrigen() { return origen; }
+    int getCompuerta() { return compuerta; }
+    int getVentanaInicio() { return ventanaInicio; }
+    int getVentanaFin() { return ventanaFin; }
+    int getMalFila() { return malFila; }
+    int getMalColumna() { return malColumna; }
+    bool getResumenFilas() { return resumenFilas; }
+    wstring getTitulo() { return titulo; }
+    wstring getMensaje() { return mensaje; }
+};
