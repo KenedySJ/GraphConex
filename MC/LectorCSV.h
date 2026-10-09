@@ -1,5 +1,4 @@
 ﻿#pragma once
-// [ARCHIVO NUEVO] Modulo que lee un grafo guardado en un .csv: una fila por nodo de origen, un 0/1 por cada nodo de destino
 
 #include "algoritmo.h"
 
@@ -12,8 +11,9 @@ public:
         cli::array<String^>^ lineas = System::IO::File::ReadAllLines(ruta);
         cli::array<wchar_t>^ separadores = gcnew cli::array<wchar_t>{ L',', L';' };
         Matriz matriz;
-
+     
         for (int f = 0; f < lineas->Length; f++) {
+			// Ignorar líneas vacías
             if (lineas[f]->Trim()->Length == 0) continue;
 
             // RemoveEmptyEntries tolera una coma o punto y coma al final de la fila

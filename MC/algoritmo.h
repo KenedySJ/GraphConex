@@ -1,10 +1,9 @@
 ﻿#pragma once
-// [CAMBIO GRANDE] Las funciones sueltas pasan a ser la clase Algoritmo, que ejecuta el proceso hasta el paso pedido
 
 #include <vector>
 #include <string>
-#include <algorithm>
-#include <numeric>
+#include <algorithm> // Usa sort
+#include <numeric> // Usa iota
 using namespace std;
 
 using Matriz = vector<vector<int>>;
@@ -17,11 +16,12 @@ private:
     int n;
     int contador;
     int objetivo;
-    Matriz vista;
-    Matriz nuevas;
-    vector<int> orden;
-    vector<int> etiquetas;
+    Matriz vista; // Matriz principal que realiza los calculos
+	Matriz nuevas; // Matriz auxiliar que marca las celdas que se agregan en cada paso
+    vector<int> orden; // Orden de los nodos por ordenar
+    vector<int> etiquetas; // Vector auxiliar que usa MatrizVisual
     vector<vector<int>> bloques;
+	// Variables de estado para la visualización
     int pivote, origen, compuerta, ventanaInicio, ventanaFin, malFila, malColumna;
     bool resumenFilas;
     wstring titulo;
@@ -194,8 +194,6 @@ public:
         return find(fila.begin(), fila.end(), 1) - fila.begin();
     }
 
-    // [CAMBIO GRANDE] No se guarda historial: para ir a cualquier paso (incluso hacia atrás) se vuelve a ejecutar el algoritmo desde cero hasta ese paso.
-    // Con n <= 12 son pocos cientos de operaciones, y así no hay que conservar una copia de la matriz por cada paso.
     void ejecutar(const Matriz& adyacencia, int pasoObjetivo) {
         n = adyacencia.size();
         contador = 0;
@@ -203,6 +201,7 @@ public:
         vista = adyacencia;
         nuevas = Matriz(n, vector<int>(n, 0));
         orden = vector<int>(n);
+		// Obtiene orden inicial de 0,1,...,n-1 para luego reordenar filas y columnas
         iota(orden.begin(), orden.end(), 0);
         etiquetas = orden;
         bloques.clear();
@@ -220,7 +219,7 @@ public:
         paso(L"Componentes conexas", texto + L".");
     }
 
-    // Ejecuta sobre una copia para no alterar el paso que se está mostrando
+    // Hace una copia sin alterar la matriz orignal.
     int contarPasos(const Matriz& adyacencia) {
         Algoritmo recorrido;
         recorrido.ejecutar(adyacencia, -1);

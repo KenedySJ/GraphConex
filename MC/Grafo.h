@@ -61,13 +61,14 @@ public:
     Color colorComponente(int indice) {
         cli::array<Color>^ paleta = gcnew cli::array<Color>{
             Color::Red, Color::Green, Color::DarkOrange, Color::Purple,
-                Color::DeepPink, Color::Cyan, Color::Brown, Color::Teal, Color::Gold
+				Color::DeepPink, Color::Cyan, Color::Brown, Color::Teal, Color::Gold,
+                Color::DarkViolet, Color::DarkCyan, Color::DarkMagenta
         };
         return paleta[indice % paleta->Length];
     }
 
     void generarMatrizAleatoria() {
-        int probabilidad = (rand() % 26) + 10; //(rand() % (MAX - MIN + 1)) + MIN y aca es 35 y 10
+        int probabilidad = (rand() % 26) + 10;
         for (int i = 0; i < numNodos; i++) {
             for (int j = 0; j < numNodos; j++) {
                 if (rand() % 100 < probabilidad) {
@@ -133,9 +134,10 @@ public:
             double dy = centro2Y - centro1Y;
             double largo = sqrt(dx * dx + dy * dy);
             double radio = c1->getAncho() / 2.0;
+			// Normaliza el vector de dirección y calcula un desplazamiento lateral 
+            // para que las aristas no se dibujen exactamente sobre los nodos
             double ux = dx / largo;
             double uy = dy / largo;
-            // Desplazamiento lateral para que la ida (A->B) y la vuelta (B->A) no se dibujen encima una de otra
             double lateralX = -uy * 6;
             double lateralY = ux * 6;
 

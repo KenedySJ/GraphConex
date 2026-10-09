@@ -1,5 +1,4 @@
 ﻿#pragma once
-// [ARCHIVO NUEVO] Dibuja la matriz del paso actual (resaltados del simulador) y convierte un clic en (fila, columna)
 
 #include "Grafo.h"
 
@@ -12,7 +11,6 @@ private:
     int celda = 0;
     int margen = 8;
 
-    // Una clase nativa no puede tener miembros Color, por eso los colores se piden por funciones
     Color colorFondo() { return Color::FromArgb(237, 241, 243); }
     Color colorPivote() { return Color::FromArgb(246, 217, 139); }
     Color colorOrigen() { return Color::FromArgb(191, 229, 232); }

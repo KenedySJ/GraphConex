@@ -1,5 +1,5 @@
 ﻿#pragma once
-// [CAMBIO GRANDE] La matriz ahora vive en este formulario: se eliminan MatrizForm.h y la salida por consola
+
 #include "Grafo.h"
 #include "MatrizVisual.h"
 #include "LectorCSV.h"
@@ -53,7 +53,7 @@ namespace MC {
 	private: System::Windows::Forms::Button^ Start_Pause;
 	private: System::Windows::Forms::Button^ Previous;
 	private: System::Windows::Forms::Button^ Beginning;
-	private: System::Windows::Forms::Panel^ Graph_Panel; // Aquí se verán los grafos visuales
+	private: System::Windows::Forms::Panel^ Graph_Panel; 
 	private: System::Windows::Forms::GroupBox^ Inputs_Panel;
 	private: System::Windows::Forms::TextBox^ NumberofNodes_TextBox;
 	private: System::Windows::Forms::Label^ NumberofNodes_Label;
@@ -62,7 +62,7 @@ namespace MC {
 	private: System::Windows::Forms::Button^ GraphGeneratorAutomatic_Button_;
 	private: System::Windows::Forms::Label^ Testing_Label;
 	private: System::Windows::Forms::Timer^ Page_Timer;
-	private: System::Windows::Forms::Panel^ Matrix_Panel; // [CAMBIO GRANDE] Matriz al costado del grafo
+	private: System::Windows::Forms::Panel^ Matrix_Panel; 
 	private: System::Windows::Forms::Label^ Description_Label;
 	private: System::Windows::Forms::Button^ GraphGeneratorCSV_Button;
 	private: System::Windows::Forms::OpenFileDialog^ CSV_Dialog;
@@ -339,7 +339,6 @@ namespace MC {
 		   }
 #pragma endregion
 
-	// [CAMBIO GRANDE] Cada paso se ejecuta al momento: el grafo solo cambia al llegar al ultimo paso
 	private: void ActualizarVistaPasoAPaso() {
 		miGrafo->ejecutarPaso(page);
 		Algoritmo& algoritmo = miGrafo->getAlgoritmo();
@@ -440,7 +439,6 @@ namespace MC {
 		}
 	}
 
-	// Solo se edita en el paso 0: despues la matriz es el resultado del algoritmo
 	private: System::Void Matrix_Panel_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
 		int fila, columna;
 		if (miGrafo == nullptr || page != 0) return;
