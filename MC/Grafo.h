@@ -1,10 +1,9 @@
 ﻿#pragma once
-// [CAMBIO GRANDE] Grafo dirigido: usa Algoritmo (sin duplicar su logica) y dibuja flechas
 
 #include <vector>
 #include <cmath>
-#include <cstdlib>
-#include <ctime>
+#include <cstdlib> // Para rand()
+#include <ctime> // Semilla random
 #include "Circulo.h"
 #include "Arista.h"
 #include "algoritmo.h"
@@ -16,6 +15,8 @@ using namespace std;
 class Grafo {
 private:
     int numNodos;
+	int panelWidth;
+	int panelHeight;
     Matriz matrizAdyacencia;
     vector<Circulo*> nodosVis;
     vector<Arista*> aristas;
@@ -32,11 +33,12 @@ private:
         }
     }
 
-public:
-    Grafo(int n, int panelWidth, int panelHeight) {
-        this->numNodos = n;
-        matrizAdyacencia = Matriz(n, vector<int>(n, 0));
-        srand((unsigned)time(0));
+    void reconstruirPosicionesCirculos(){
+        for (Circulo* nodo : nodosVis) delete nodo;
+        nodosVis.clear();
+        calcularPosicionesCirculos(numNodos, panelWidth, panelHeight);
+    }
+	void calcularPosicionesCirculos(int n, int panelWidth, int panelHeight) {
         int radioGrafo = (panelWidth < panelHeight ? panelWidth : panelHeight) / 2 - 40;
         int centroX = panelWidth / 2;
         int centroY = panelHeight / 2;
@@ -48,6 +50,16 @@ public:
             int posY = centroY + (int)(radioGrafo * sin(angulo)) - (diametroNodo / 2);
             nodosVis.push_back(new Circulo(posX, posY, diametroNodo, 0, 0, 255, true, i + 1));
         }
+	}
+
+public:
+    Grafo(int n, int panelWidth, int panelHeight) {
+		this->panelHeight = panelHeight;
+		this->panelWidth = panelWidth;
+        this->numNodos = n;
+        matrizAdyacencia = Matriz(n, vector<int>(n, 0));
+        srand((unsigned)time(0));
+		calcularPosicionesCirculos(n, panelWidth, panelHeight);
     }
 
     ~Grafo() {
@@ -68,7 +80,8 @@ public:
     }
 
     void generarMatrizAleatoria() {
-        int probabilidad = (rand() % 26) + 10;
+        int probabilidad = (rand() % 26) + 10; 
+        // rand 35-10+1=26, +10 
         for (int i = 0; i < numNodos; i++) {
             for (int j = 0; j < numNodos; j++) {
                 if (rand() % 100 < probabilidad) {
@@ -138,6 +151,8 @@ public:
             // para que las aristas no se dibujen exactamente sobre los nodos
             double ux = dx / largo;
             double uy = dy / largo;
+			// Desplazamiento lateral de 6 unidades
+			// Esto evita que dos aristas no se sobrepongan exactamente si van en direcciones opuestas
             double lateralX = -uy * 6;
             double lateralY = ux * 6;
 
@@ -148,5 +163,38 @@ public:
         delete penArista;
 
         for (Circulo* c : nodosVis) c->dibujar(graphics);
+    }
+    // Segunda entrega desarrollo
+    void agregarNodo() {
+		numNodos++;
+		matrizAdyacencia.resize(numNodos);
+		for (int i = 0; i < numNodos; i++) {
+			matrizAdyacencia[i].resize(numNodos, 0);
+		}
+        reconstruirPosicionesCirculos();
+    }
+    void eliminarNodo(int nodoAEliminar) {
+        if (nodoAEliminar < 0 || nodoAEliminar >= numNodos) return;
+
+        // Quita las aristas que tocan el nodo y renumera las demás
+        for (size_t i = 0; i < aristas.size(); ) {
+            if (aristas[i]->origen == nodoAEliminar || aristas[i]->destino == nodoAEliminar) {
+                delete aristas[i];
+                aristas.erase(aristas.begin() + i);
+            }
+            else {
+                if (aristas[i]->origen > nodoAEliminar) aristas[i]->origen--;
+                if (aristas[i]->destino > nodoAEliminar) aristas[i]->destino--;
+                ++i;
+            }
+        }
+
+        // Quita la fila y la columna del nodo en la matriz
+        matrizAdyacencia.erase(matrizAdyacencia.begin() + nodoAEliminar);
+        for (int i = 0; i < numNodos - 1; i++)
+            matrizAdyacencia[i].erase(matrizAdyacencia[i].begin() + nodoAEliminar);
+
+        numNodos--;
+        reconstruirPosicionesCirculos();
     }
 };

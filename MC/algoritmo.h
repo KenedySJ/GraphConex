@@ -96,10 +96,10 @@ private:
                     if (paso(L"Matriz de caminos (en construcción)", texto)) return true;
                     continue;
                 }
-                vector<int> alcanzables;
+				vector<int> alcanzables; 
                 wstring celdasNuevas;
                 for (int j = 0; j < n; j++) {
-                    if (vista[k][j] == 1) alcanzables.push_back(j);
+					if (vista[k][j] == 1) alcanzables.push_back(j); 
                     if (vista[k][j] == 1 && vista[i][j] == 0) {
                         vista[i][j] = 1;
                         nuevas[i][j] = 1;
