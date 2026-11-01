@@ -343,6 +343,7 @@ namespace MC {
 			   this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			   this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			   this->BackColor = System::Drawing::Color::LightGray;
+			   this->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"$this.BackgroundImage")));
 			   this->ClientSize = System::Drawing::Size(985, 519);
 			   this->Controls->Add(this->Description_Label);
 			   this->Controls->Add(this->Matrix_Panel);
