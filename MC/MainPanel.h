@@ -25,6 +25,26 @@ namespace MC {
 
 	private: System::Windows::Forms::Button^ Add_Node;
 	private: System::Windows::Forms::TextBox^ NodoAEliminar;
+	private: System::Windows::Forms::PictureBox^ pb2_4a12;
+	private: System::Windows::Forms::PictureBox^ pb1_generarGrafo;
+	private: System::Windows::Forms::Button^ GraphGeneratorAutomatic_Button_;
+	private: System::Windows::Forms::Button^ GraphGeneratorCSV_Button;
+	private: System::Windows::Forms::TextBox^ NumberofNodes_TextBox;
+	private: System::Windows::Forms::Button^ GraphGeneratorManual_Botton;
+	private: System::Windows::Forms::Panel^ panel1;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 		   MatrizVisual* miMatriz = nullptr;
@@ -59,17 +79,17 @@ namespace MC {
 	private: System::Windows::Forms::Button^ Previous;
 	private: System::Windows::Forms::Button^ Beginning;
 	private: System::Windows::Forms::Panel^ Graph_Panel; 
-	private: System::Windows::Forms::GroupBox^ Inputs_Panel;
-	private: System::Windows::Forms::TextBox^ NumberofNodes_TextBox;
-	private: System::Windows::Forms::Label^ NumberofNodes_Label;
-	private: System::Windows::Forms::Label^ GrafoGenerator_Label;
-	private: System::Windows::Forms::Button^ GraphGeneratorManual_Botton;
-	private: System::Windows::Forms::Button^ GraphGeneratorAutomatic_Button_;
+
+
+
+
+
+
 	private: System::Windows::Forms::Label^ Testing_Label;
 	private: System::Windows::Forms::Timer^ Page_Timer;
 	private: System::Windows::Forms::Panel^ Matrix_Panel; 
 	private: System::Windows::Forms::Label^ Description_Label;
-	private: System::Windows::Forms::Button^ GraphGeneratorCSV_Button;
+
 	private: System::Windows::Forms::OpenFileDialog^ CSV_Dialog;
 	private: System::ComponentModel::IContainer^ components;
 
@@ -89,22 +109,24 @@ namespace MC {
 			   this->Beginning = (gcnew System::Windows::Forms::Button());
 			   this->Graph_Panel = (gcnew System::Windows::Forms::Panel());
 			   this->Testing_Label = (gcnew System::Windows::Forms::Label());
-			   this->Inputs_Panel = (gcnew System::Windows::Forms::GroupBox());
-			   this->GraphGeneratorCSV_Button = (gcnew System::Windows::Forms::Button());
-			   this->GraphGeneratorManual_Botton = (gcnew System::Windows::Forms::Button());
-			   this->GraphGeneratorAutomatic_Button_ = (gcnew System::Windows::Forms::Button());
-			   this->GrafoGenerator_Label = (gcnew System::Windows::Forms::Label());
-			   this->NumberofNodes_TextBox = (gcnew System::Windows::Forms::TextBox());
-			   this->NumberofNodes_Label = (gcnew System::Windows::Forms::Label());
 			   this->Page_Timer = (gcnew System::Windows::Forms::Timer(this->components));
 			   this->pb1Logo = (gcnew System::Windows::Forms::PictureBox());
 			   this->Matrix_Panel = (gcnew System::Windows::Forms::Panel());
 			   this->Description_Label = (gcnew System::Windows::Forms::Label());
 			   this->CSV_Dialog = (gcnew System::Windows::Forms::OpenFileDialog());
+			   this->NumberofNodes_TextBox = (gcnew System::Windows::Forms::TextBox());
+			   this->GraphGeneratorAutomatic_Button_ = (gcnew System::Windows::Forms::Button());
+			   this->GraphGeneratorManual_Botton = (gcnew System::Windows::Forms::Button());
+			   this->GraphGeneratorCSV_Button = (gcnew System::Windows::Forms::Button());
+			   this->pb1_generarGrafo = (gcnew System::Windows::Forms::PictureBox());
+			   this->pb2_4a12 = (gcnew System::Windows::Forms::PictureBox());
+			   this->panel1 = (gcnew System::Windows::Forms::Panel());
 			   this->Buttons->SuspendLayout();
 			   this->Graph_Panel->SuspendLayout();
-			   this->Inputs_Panel->SuspendLayout();
 			   (cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pb1Logo))->BeginInit();
+			   (cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pb1_generarGrafo))->BeginInit();
+			   (cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pb2_4a12))->BeginInit();
+			   this->panel1->SuspendLayout();
 			   this->SuspendLayout();
 			   // 
 			   // Buttons
@@ -117,25 +139,29 @@ namespace MC {
 			   this->Buttons->Controls->Add(this->Start_Pause);
 			   this->Buttons->Controls->Add(this->Previous);
 			   this->Buttons->Controls->Add(this->Beginning);
-			   this->Buttons->Location = System::Drawing::Point(217, 370);
+			   this->Buttons->Location = System::Drawing::Point(320, 712);
+			   this->Buttons->Margin = System::Windows::Forms::Padding(6, 6, 6, 6);
 			   this->Buttons->Name = L"Buttons";
-			   this->Buttons->Size = System::Drawing::Size(418, 137);
+			   this->Buttons->Padding = System::Windows::Forms::Padding(6, 6, 6, 6);
+			   this->Buttons->Size = System::Drawing::Size(836, 263);
 			   this->Buttons->TabIndex = 0;
 			   this->Buttons->TabStop = false;
 			   // 
 			   // NodoAEliminar
 			   // 
-			   this->NodoAEliminar->Location = System::Drawing::Point(285, 94);
+			   this->NodoAEliminar->Location = System::Drawing::Point(570, 181);
+			   this->NodoAEliminar->Margin = System::Windows::Forms::Padding(6, 6, 6, 6);
 			   this->NodoAEliminar->Name = L"NodoAEliminar";
-			   this->NodoAEliminar->Size = System::Drawing::Size(116, 20);
+			   this->NodoAEliminar->Size = System::Drawing::Size(228, 31);
 			   this->NodoAEliminar->TabIndex = 7;
 			   this->NodoAEliminar->Text = L"Elija el nodo eliminar";
 			   // 
 			   // Delete_Node
 			   // 
-			   this->Delete_Node->Location = System::Drawing::Point(178, 88);
+			   this->Delete_Node->Location = System::Drawing::Point(356, 169);
+			   this->Delete_Node->Margin = System::Windows::Forms::Padding(6, 6, 6, 6);
 			   this->Delete_Node->Name = L"Delete_Node";
-			   this->Delete_Node->Size = System::Drawing::Size(92, 31);
+			   this->Delete_Node->Size = System::Drawing::Size(184, 60);
 			   this->Delete_Node->TabIndex = 6;
 			   this->Delete_Node->Text = L"Eliminar_Nodo";
 			   this->Delete_Node->UseVisualStyleBackColor = true;
@@ -143,9 +169,10 @@ namespace MC {
 			   // 
 			   // Add_Node
 			   // 
-			   this->Add_Node->Location = System::Drawing::Point(28, 88);
+			   this->Add_Node->Location = System::Drawing::Point(56, 169);
+			   this->Add_Node->Margin = System::Windows::Forms::Padding(6, 6, 6, 6);
 			   this->Add_Node->Name = L"Add_Node";
-			   this->Add_Node->Size = System::Drawing::Size(91, 31);
+			   this->Add_Node->Size = System::Drawing::Size(182, 60);
 			   this->Add_Node->TabIndex = 5;
 			   this->Add_Node->Text = L"Agregar nodo";
 			   this->Add_Node->UseVisualStyleBackColor = true;
@@ -154,9 +181,10 @@ namespace MC {
 			   // Final
 			   // 
 			   this->Final->Cursor = System::Windows::Forms::Cursors::Hand;
-			   this->Final->Location = System::Drawing::Point(333, 41);
+			   this->Final->Location = System::Drawing::Point(666, 79);
+			   this->Final->Margin = System::Windows::Forms::Padding(6, 6, 6, 6);
 			   this->Final->Name = L"Final";
-			   this->Final->Size = System::Drawing::Size(54, 23);
+			   this->Final->Size = System::Drawing::Size(108, 44);
 			   this->Final->TabIndex = 4;
 			   this->Final->Text = L"⏭";
 			   this->Final->UseVisualStyleBackColor = true;
@@ -165,9 +193,10 @@ namespace MC {
 			   // Next
 			   // 
 			   this->Next->Cursor = System::Windows::Forms::Cursors::Hand;
-			   this->Next->Location = System::Drawing::Point(253, 42);
+			   this->Next->Location = System::Drawing::Point(506, 81);
+			   this->Next->Margin = System::Windows::Forms::Padding(6, 6, 6, 6);
 			   this->Next->Name = L"Next";
-			   this->Next->Size = System::Drawing::Size(54, 23);
+			   this->Next->Size = System::Drawing::Size(108, 44);
 			   this->Next->TabIndex = 3;
 			   this->Next->Text = L"⏩";
 			   this->Next->UseVisualStyleBackColor = true;
@@ -176,9 +205,10 @@ namespace MC {
 			   // Start_Pause
 			   // 
 			   this->Start_Pause->Cursor = System::Windows::Forms::Cursors::Hand;
-			   this->Start_Pause->Location = System::Drawing::Point(178, 41);
+			   this->Start_Pause->Location = System::Drawing::Point(356, 79);
+			   this->Start_Pause->Margin = System::Windows::Forms::Padding(6, 6, 6, 6);
 			   this->Start_Pause->Name = L"Start_Pause";
-			   this->Start_Pause->Size = System::Drawing::Size(54, 25);
+			   this->Start_Pause->Size = System::Drawing::Size(108, 48);
 			   this->Start_Pause->TabIndex = 2;
 			   this->Start_Pause->Text = L"⏵";
 			   this->Start_Pause->UseVisualStyleBackColor = true;
@@ -188,9 +218,10 @@ namespace MC {
 			   // 
 			   this->Previous->Cursor = System::Windows::Forms::Cursors::Hand;
 			   this->Previous->Enabled = false;
-			   this->Previous->Location = System::Drawing::Point(106, 43);
+			   this->Previous->Location = System::Drawing::Point(212, 83);
+			   this->Previous->Margin = System::Windows::Forms::Padding(6, 6, 6, 6);
 			   this->Previous->Name = L"Previous";
-			   this->Previous->Size = System::Drawing::Size(54, 23);
+			   this->Previous->Size = System::Drawing::Size(108, 44);
 			   this->Previous->TabIndex = 1;
 			   this->Previous->Text = L"⏪";
 			   this->Previous->UseVisualStyleBackColor = true;
@@ -199,9 +230,10 @@ namespace MC {
 			   // Beginning
 			   // 
 			   this->Beginning->Cursor = System::Windows::Forms::Cursors::Hand;
-			   this->Beginning->Location = System::Drawing::Point(28, 43);
+			   this->Beginning->Location = System::Drawing::Point(56, 83);
+			   this->Beginning->Margin = System::Windows::Forms::Padding(6, 6, 6, 6);
 			   this->Beginning->Name = L"Beginning";
-			   this->Beginning->Size = System::Drawing::Size(54, 23);
+			   this->Beginning->Size = System::Drawing::Size(108, 44);
 			   this->Beginning->TabIndex = 0;
 			   this->Beginning->Text = L"⏮";
 			   this->Beginning->UseVisualStyleBackColor = true;
@@ -211,9 +243,10 @@ namespace MC {
 			   // 
 			   this->Graph_Panel->BackColor = System::Drawing::Color::White;
 			   this->Graph_Panel->Controls->Add(this->Testing_Label);
-			   this->Graph_Panel->Location = System::Drawing::Point(203, 34);
+			   this->Graph_Panel->Location = System::Drawing::Point(320, 65);
+			   this->Graph_Panel->Margin = System::Windows::Forms::Padding(6, 6, 6, 6);
 			   this->Graph_Panel->Name = L"Graph_Panel";
-			   this->Graph_Panel->Size = System::Drawing::Size(451, 317);
+			   this->Graph_Panel->Size = System::Drawing::Size(883, 610);
 			   this->Graph_Panel->TabIndex = 1;
 			   this->Graph_Panel->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &MainPanel::Graph_Panel_Paint);
 			   // 
@@ -222,81 +255,12 @@ namespace MC {
 			   this->Testing_Label->AutoSize = true;
 			   this->Testing_Label->Font = (gcnew System::Drawing::Font(L"Modern No. 20", 14.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				   static_cast<System::Byte>(0)));
-			   this->Testing_Label->Location = System::Drawing::Point(10, 10);
+			   this->Testing_Label->Location = System::Drawing::Point(20, 19);
+			   this->Testing_Label->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			   this->Testing_Label->Name = L"Testing_Label";
-			   this->Testing_Label->Size = System::Drawing::Size(67, 21);
+			   this->Testing_Label->Size = System::Drawing::Size(96, 31);
 			   this->Testing_Label->TabIndex = 0;
 			   this->Testing_Label->Text = L"Paso 0";
-			   // 
-			   // Inputs_Panel
-			   // 
-			   this->Inputs_Panel->Controls->Add(this->GraphGeneratorCSV_Button);
-			   this->Inputs_Panel->Controls->Add(this->GraphGeneratorManual_Botton);
-			   this->Inputs_Panel->Controls->Add(this->GraphGeneratorAutomatic_Button_);
-			   this->Inputs_Panel->Controls->Add(this->GrafoGenerator_Label);
-			   this->Inputs_Panel->Controls->Add(this->NumberofNodes_TextBox);
-			   this->Inputs_Panel->Controls->Add(this->NumberofNodes_Label);
-			   this->Inputs_Panel->Location = System::Drawing::Point(12, 75);
-			   this->Inputs_Panel->Name = L"Inputs_Panel";
-			   this->Inputs_Panel->Size = System::Drawing::Size(170, 432);
-			   this->Inputs_Panel->TabIndex = 2;
-			   this->Inputs_Panel->TabStop = false;
-			   // 
-			   // GraphGeneratorCSV_Button
-			   // 
-			   this->GraphGeneratorCSV_Button->Cursor = System::Windows::Forms::Cursors::Hand;
-			   this->GraphGeneratorCSV_Button->Location = System::Drawing::Point(5, 163);
-			   this->GraphGeneratorCSV_Button->Name = L"GraphGeneratorCSV_Button";
-			   this->GraphGeneratorCSV_Button->Size = System::Drawing::Size(144, 27);
-			   this->GraphGeneratorCSV_Button->TabIndex = 5;
-			   this->GraphGeneratorCSV_Button->Text = L"Cargar CSV";
-			   this->GraphGeneratorCSV_Button->UseVisualStyleBackColor = true;
-			   this->GraphGeneratorCSV_Button->Click += gcnew System::EventHandler(this, &MainPanel::GraphGeneratorCSV_Button_Click);
-			   // 
-			   // GraphGeneratorManual_Botton
-			   // 
-			   this->GraphGeneratorManual_Botton->Cursor = System::Windows::Forms::Cursors::Hand;
-			   this->GraphGeneratorManual_Botton->Location = System::Drawing::Point(5, 131);
-			   this->GraphGeneratorManual_Botton->Name = L"GraphGeneratorManual_Botton";
-			   this->GraphGeneratorManual_Botton->Size = System::Drawing::Size(69, 27);
-			   this->GraphGeneratorManual_Botton->TabIndex = 4;
-			   this->GraphGeneratorManual_Botton->Text = L"Manual";
-			   this->GraphGeneratorManual_Botton->UseVisualStyleBackColor = true;
-			   this->GraphGeneratorManual_Botton->Click += gcnew System::EventHandler(this, &MainPanel::GraphGeneratorManual_Botton_Click);
-			   // 
-			   // GraphGeneratorAutomatic_Button_
-			   // 
-			   this->GraphGeneratorAutomatic_Button_->Cursor = System::Windows::Forms::Cursors::Hand;
-			   this->GraphGeneratorAutomatic_Button_->Location = System::Drawing::Point(80, 131);
-			   this->GraphGeneratorAutomatic_Button_->Name = L"GraphGeneratorAutomatic_Button_";
-			   this->GraphGeneratorAutomatic_Button_->Size = System::Drawing::Size(69, 27);
-			   this->GraphGeneratorAutomatic_Button_->TabIndex = 3;
-			   this->GraphGeneratorAutomatic_Button_->Text = L"Auto";
-			   this->GraphGeneratorAutomatic_Button_->UseVisualStyleBackColor = true;
-			   this->GraphGeneratorAutomatic_Button_->Click += gcnew System::EventHandler(this, &MainPanel::GraphGeneratorAutomatic_Button__Click);
-			   // 
-			   // GrafoGenerator_Label
-			   // 
-			   this->GrafoGenerator_Label->Location = System::Drawing::Point(15, 103);
-			   this->GrafoGenerator_Label->Name = L"GrafoGenerator_Label";
-			   this->GrafoGenerator_Label->Size = System::Drawing::Size(100, 25);
-			   this->GrafoGenerator_Label->TabIndex = 2;
-			   this->GrafoGenerator_Label->Text = L"Generar Grafo:";
-			   // 
-			   // NumberofNodes_TextBox
-			   // 
-			   this->NumberofNodes_TextBox->Location = System::Drawing::Point(17, 63);
-			   this->NumberofNodes_TextBox->Name = L"NumberofNodes_TextBox";
-			   this->NumberofNodes_TextBox->Size = System::Drawing::Size(100, 20);
-			   this->NumberofNodes_TextBox->TabIndex = 1;
-			   // 
-			   // NumberofNodes_Label
-			   // 
-			   this->NumberofNodes_Label->Location = System::Drawing::Point(17, 34);
-			   this->NumberofNodes_Label->Name = L"NumberofNodes_Label";
-			   this->NumberofNodes_Label->Size = System::Drawing::Size(100, 37);
-			   this->NumberofNodes_Label->TabIndex = 0;
-			   this->NumberofNodes_Label->Text = L"Cantidad de Nodos (4-12):";
 			   // 
 			   // Page_Timer
 			   // 
@@ -308,29 +272,30 @@ namespace MC {
 			   this->pb1Logo->BackColor = System::Drawing::Color::Transparent;
 			   this->pb1Logo->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"pb1Logo.BackgroundImage")));
 			   this->pb1Logo->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
-			   this->pb1Logo->Location = System::Drawing::Point(8, 9);
-			   this->pb1Logo->Margin = System::Windows::Forms::Padding(2);
+			   this->pb1Logo->Location = System::Drawing::Point(0, 0);
+			   this->pb1Logo->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			   this->pb1Logo->Name = L"pb1Logo";
-			   this->pb1Logo->Size = System::Drawing::Size(174, 77);
+			   this->pb1Logo->Size = System::Drawing::Size(305, 144);
 			   this->pb1Logo->TabIndex = 3;
 			   this->pb1Logo->TabStop = false;
 			   // 
 			   // Matrix_Panel
 			   // 
 			   this->Matrix_Panel->BackColor = System::Drawing::Color::White;
-			   this->Matrix_Panel->Location = System::Drawing::Point(673, 34);
+			   this->Matrix_Panel->Location = System::Drawing::Point(1226, 65);
+			   this->Matrix_Panel->Margin = System::Windows::Forms::Padding(6, 6, 6, 6);
 			   this->Matrix_Panel->Name = L"Matrix_Panel";
-			   this->Matrix_Panel->Size = System::Drawing::Size(293, 317);
+			   this->Matrix_Panel->Size = System::Drawing::Size(563, 610);
 			   this->Matrix_Panel->TabIndex = 4;
 			   this->Matrix_Panel->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &MainPanel::Matrix_Panel_Paint);
 			   this->Matrix_Panel->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &MainPanel::Matrix_Panel_MouseClick);
 			   // 
 			   // Description_Label
 			   // 
-			   this->Description_Label->Location = System::Drawing::Point(673, 370);
-			   this->Description_Label->Margin = System::Windows::Forms::Padding(2, 0, 2, 0);
+			   this->Description_Label->Location = System::Drawing::Point(1221, 712);
+			   this->Description_Label->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			   this->Description_Label->Name = L"Description_Label";
-			   this->Description_Label->Size = System::Drawing::Size(293, 100);
+			   this->Description_Label->Size = System::Drawing::Size(538, 203);
 			   this->Description_Label->TabIndex = 5;
 			   // 
 			   // CSV_Dialog
@@ -338,29 +303,128 @@ namespace MC {
 			   this->CSV_Dialog->Filter = L"Archivos CSV (*.csv)|*.csv";
 			   this->CSV_Dialog->Title = L"Cargar grafo desde CSV";
 			   // 
+			   // NumberofNodes_TextBox
+			   // 
+			   this->NumberofNodes_TextBox->Location = System::Drawing::Point(30, 130);
+			   this->NumberofNodes_TextBox->Margin = System::Windows::Forms::Padding(6);
+			   this->NumberofNodes_TextBox->Name = L"NumberofNodes_TextBox";
+			   this->NumberofNodes_TextBox->Size = System::Drawing::Size(204, 31);
+			   this->NumberofNodes_TextBox->TabIndex = 1;
+			   // 
+			   // GraphGeneratorAutomatic_Button_
+			   // 
+			   this->GraphGeneratorAutomatic_Button_->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"GraphGeneratorAutomatic_Button_.BackgroundImage")));
+			   this->GraphGeneratorAutomatic_Button_->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Zoom;
+			   this->GraphGeneratorAutomatic_Button_->Cursor = System::Windows::Forms::Cursors::Hand;
+			   this->GraphGeneratorAutomatic_Button_->FlatAppearance->BorderSize = 0;
+			   this->GraphGeneratorAutomatic_Button_->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
+			   this->GraphGeneratorAutomatic_Button_->Location = System::Drawing::Point(29, 299);
+			   this->GraphGeneratorAutomatic_Button_->Margin = System::Windows::Forms::Padding(6);
+			   this->GraphGeneratorAutomatic_Button_->Name = L"GraphGeneratorAutomatic_Button_";
+			   this->GraphGeneratorAutomatic_Button_->Size = System::Drawing::Size(187, 65);
+			   this->GraphGeneratorAutomatic_Button_->TabIndex = 3;
+			   this->GraphGeneratorAutomatic_Button_->UseVisualStyleBackColor = true;
+			   this->GraphGeneratorAutomatic_Button_->Click += gcnew System::EventHandler(this, &MainPanel::GraphGeneratorAutomatic_Button__Click);
+			   // 
+			   // GraphGeneratorManual_Botton
+			   // 
+			   this->GraphGeneratorManual_Botton->BackColor = System::Drawing::Color::Transparent;
+			   this->GraphGeneratorManual_Botton->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"GraphGeneratorManual_Botton.BackgroundImage")));
+			   this->GraphGeneratorManual_Botton->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Zoom;
+			   this->GraphGeneratorManual_Botton->Cursor = System::Windows::Forms::Cursors::Hand;
+			   this->GraphGeneratorManual_Botton->FlatAppearance->BorderColor = System::Drawing::SystemColors::ActiveCaption;
+			   this->GraphGeneratorManual_Botton->FlatAppearance->BorderSize = 0;
+			   this->GraphGeneratorManual_Botton->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
+			   this->GraphGeneratorManual_Botton->ForeColor = System::Drawing::Color::Transparent;
+			   this->GraphGeneratorManual_Botton->ImageAlign = System::Drawing::ContentAlignment::TopCenter;
+			   this->GraphGeneratorManual_Botton->Location = System::Drawing::Point(29, 376);
+			   this->GraphGeneratorManual_Botton->Margin = System::Windows::Forms::Padding(6);
+			   this->GraphGeneratorManual_Botton->Name = L"GraphGeneratorManual_Botton";
+			   this->GraphGeneratorManual_Botton->Size = System::Drawing::Size(187, 65);
+			   this->GraphGeneratorManual_Botton->TabIndex = 4;
+			   this->GraphGeneratorManual_Botton->UseVisualStyleBackColor = false;
+			   this->GraphGeneratorManual_Botton->Click += gcnew System::EventHandler(this, &MainPanel::GraphGeneratorManual_Botton_Click);
+			   // 
+			   // GraphGeneratorCSV_Button
+			   // 
+			   this->GraphGeneratorCSV_Button->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"GraphGeneratorCSV_Button.BackgroundImage")));
+			   this->GraphGeneratorCSV_Button->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Zoom;
+			   this->GraphGeneratorCSV_Button->Cursor = System::Windows::Forms::Cursors::Hand;
+			   this->GraphGeneratorCSV_Button->FlatAppearance->BorderSize = 0;
+			   this->GraphGeneratorCSV_Button->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
+			   this->GraphGeneratorCSV_Button->Location = System::Drawing::Point(29, 453);
+			   this->GraphGeneratorCSV_Button->Margin = System::Windows::Forms::Padding(6);
+			   this->GraphGeneratorCSV_Button->Name = L"GraphGeneratorCSV_Button";
+			   this->GraphGeneratorCSV_Button->Size = System::Drawing::Size(187, 59);
+			   this->GraphGeneratorCSV_Button->TabIndex = 5;
+			   this->GraphGeneratorCSV_Button->UseVisualStyleBackColor = true;
+			   this->GraphGeneratorCSV_Button->Click += gcnew System::EventHandler(this, &MainPanel::GraphGeneratorCSV_Button_Click);
+			   // 
+			   // pb1_generarGrafo
+			   // 
+			   this->pb1_generarGrafo->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"pb1_generarGrafo.BackgroundImage")));
+			   this->pb1_generarGrafo->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
+			   this->pb1_generarGrafo->Location = System::Drawing::Point(28, 215);
+			   this->pb1_generarGrafo->Name = L"pb1_generarGrafo";
+			   this->pb1_generarGrafo->Size = System::Drawing::Size(193, 61);
+			   this->pb1_generarGrafo->TabIndex = 6;
+			   this->pb1_generarGrafo->TabStop = false;
+			   // 
+			   // pb2_4a12
+			   // 
+			   this->pb2_4a12->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"pb2_4a12.BackgroundImage")));
+			   this->pb2_4a12->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
+			   this->pb2_4a12->Location = System::Drawing::Point(30, 52);
+			   this->pb2_4a12->Name = L"pb2_4a12";
+			   this->pb2_4a12->Size = System::Drawing::Size(204, 69);
+			   this->pb2_4a12->TabIndex = 7;
+			   this->pb2_4a12->TabStop = false;
+			   // 
+			   // panel1
+			   // 
+			   this->panel1->BackColor = System::Drawing::Color::Transparent;
+			   this->panel1->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"panel1.BackgroundImage")));
+			   this->panel1->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
+			   this->panel1->Controls->Add(this->pb2_4a12);
+			   this->panel1->Controls->Add(this->pb1_generarGrafo);
+			   this->panel1->Controls->Add(this->NumberofNodes_TextBox);
+			   this->panel1->Controls->Add(this->GraphGeneratorAutomatic_Button_);
+			   this->panel1->Controls->Add(this->GraphGeneratorCSV_Button);
+			   this->panel1->Controls->Add(this->GraphGeneratorManual_Botton);
+			   this->panel1->Location = System::Drawing::Point(0, 143);
+			   this->panel1->Name = L"panel1";
+			   this->panel1->Size = System::Drawing::Size(275, 710);
+			   this->panel1->TabIndex = 6;
+			   // 
 			   // MainPanel
 			   // 
-			   this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
+			   this->AutoScaleDimensions = System::Drawing::SizeF(12, 25);
 			   this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			   this->BackColor = System::Drawing::Color::LightGray;
 			   this->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"$this.BackgroundImage")));
-			   this->ClientSize = System::Drawing::Size(985, 519);
+			   this->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
+			   this->ClientSize = System::Drawing::Size(1850, 998);
+			   this->Controls->Add(this->panel1);
 			   this->Controls->Add(this->Description_Label);
 			   this->Controls->Add(this->Matrix_Panel);
 			   this->Controls->Add(this->pb1Logo);
-			   this->Controls->Add(this->Inputs_Panel);
 			   this->Controls->Add(this->Graph_Panel);
 			   this->Controls->Add(this->Buttons);
+			   this->Margin = System::Windows::Forms::Padding(6, 6, 6, 6);
 			   this->Name = L"MainPanel";
+			   this->Padding = System::Windows::Forms::Padding(6);
 			   this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
-			   this->Text = L"Proyecto Componentes Conexas";
+			   this->Text = L" ";
+			   this->Load += gcnew System::EventHandler(this, &MainPanel::MainPanel_Load);
 			   this->Buttons->ResumeLayout(false);
 			   this->Buttons->PerformLayout();
 			   this->Graph_Panel->ResumeLayout(false);
 			   this->Graph_Panel->PerformLayout();
-			   this->Inputs_Panel->ResumeLayout(false);
-			   this->Inputs_Panel->PerformLayout();
 			   (cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pb1Logo))->EndInit();
+			   (cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pb1_generarGrafo))->EndInit();
+			   (cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pb2_4a12))->EndInit();
+			   this->panel1->ResumeLayout(false);
+			   this->panel1->PerformLayout();
 			   this->ResumeLayout(false);
 
 		   }
@@ -541,5 +605,7 @@ namespace MC {
 		}
 
 	}
+private: System::Void MainPanel_Load(System::Object^ sender, System::EventArgs^ e) {
+}
 };
 }
