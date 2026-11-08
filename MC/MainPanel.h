@@ -38,8 +38,6 @@ namespace MC {
 	private: System::Windows::Forms::Panel^ panel1;
 	private: System::Windows::Forms::PictureBox^ pb2_4a12;
 
-
-
 		   MatrizVisual* miMatriz = nullptr;
 
 	public:
@@ -71,12 +69,12 @@ namespace MC {
 	private: System::Windows::Forms::Button^ Start_Pause;
 	private: System::Windows::Forms::Button^ Previous;
 	private: System::Windows::Forms::Button^ Beginning;
-	private: System::Windows::Forms::Panel^ Graph_Panel; 
+	private: System::Windows::Forms::Panel^ Graph_Panel;
 
 
 	private: System::Windows::Forms::Label^ Testing_Label;
 	private: System::Windows::Forms::Timer^ Page_Timer;
-	private: System::Windows::Forms::Panel^ Matrix_Panel; 
+	private: System::Windows::Forms::Panel^ Matrix_Panel;
 	private: System::Windows::Forms::Label^ Description_Label;
 
 	private: System::Windows::Forms::OpenFileDialog^ CSV_Dialog;
@@ -504,13 +502,13 @@ namespace MC {
 		}
 	}
 
-private: System::Void GraphGeneratorManual_Botton_Click(System::Object^ sender, System::EventArgs^ e) {
-	MostrarInputNodos(GraphGeneratorManual_Botton, false);
-}
+	private: System::Void GraphGeneratorManual_Botton_Click(System::Object^ sender, System::EventArgs^ e) {
+		MostrarInputNodos(GraphGeneratorManual_Botton, false);
+	}
 
-private: System::Void GraphGeneratorAutomatic_Button__Click(System::Object^ sender, System::EventArgs^ e) {
-	MostrarInputNodos(GraphGeneratorAutomatic_Button_, true);
-}
+	private: System::Void GraphGeneratorAutomatic_Button__Click(System::Object^ sender, System::EventArgs^ e) {
+		MostrarInputNodos(GraphGeneratorAutomatic_Button_, true);
+	}
 
 	private: System::Void GraphGeneratorCSV_Button_Click(System::Object^ sender, System::EventArgs^ e) {
 		if (CSV_Dialog->ShowDialog() != System::Windows::Forms::DialogResult::OK) return;
@@ -538,174 +536,178 @@ private: System::Void GraphGeneratorAutomatic_Button__Click(System::Object^ send
 		}
 	}
 
-private: System::Void Delete_Node_Click(System::Object^ sender, System::EventArgs^ e) {
-	if (miGrafo == nullptr) {
-		MessageBox::Show("Primero debe generar un grafo.", "Aviso");
-		return;
+	private: System::Void Delete_Node_Click(System::Object^ sender, System::EventArgs^ e) {
+		if (miGrafo == nullptr) {
+			MessageBox::Show("Primero debe generar un grafo.", "Aviso");
+			return;
+		}
+		if (miGrafo->getNumNodos() <= MIN_NODOS) {
+			MessageBox::Show("La cantidad de nodos es insuficiente.", "Aviso",
+				MessageBoxButtons::OK, MessageBoxIcon::Warning);
+			return;
+		}
+		if (listaNodosTemporal != nullptr) {
+			CancelarComboBox();
+			return;
+		}
+		listaNodosTemporal = gcnew ComboBox();
+		listaNodosTemporal->DropDownStyle = ComboBoxStyle::DropDownList;
+		listaNodosTemporal->Location = Delete_Node->Location;
+		listaNodosTemporal->Size = Delete_Node->Size;
+
+		// Se llena únicamente con los IDs reales de los nodos que siguen en el grafo
+		const vector<int>& ids = miGrafo->getIdsNodos();
+		for (size_t i = 0; i < ids.size(); i++) {
+			listaNodosTemporal->Items->Add(ids[i].ToString());
+		}
+
+		listaNodosTemporal->SelectedIndex = -1;
+		Delete_Node->Visible = false;
+		Buttons->Controls->Add(listaNodosTemporal);
+		listaNodosTemporal->BringToFront();
+
+		listaNodosTemporal->SelectionChangeCommitted +=
+			gcnew System::EventHandler(this, &MainPanel::EliminarNodoSeleccionado);
+		listaNodosTemporal->DropDownClosed +=
+			gcnew System::EventHandler(this, &MainPanel::ComboCerrado);
+		listaNodosTemporal->DroppedDown = true;
 	}
-	if (miGrafo->getNumNodos() <= MIN_NODOS) {
-		MessageBox::Show("La cantidad de nodos es insuficiente.", "Aviso",
-			MessageBoxButtons::OK, MessageBoxIcon::Warning);
-		return;
+
+	private: System::Void ComboCerrado(System::Object^ sender, System::EventArgs^ e) {
+		this->BeginInvoke(gcnew MethodInvoker(this, &MainPanel::CancelarComboBox));
 	}
-	if (listaNodosTemporal != nullptr) {
+
+	private: System::Void EliminarNodoSeleccionado(System::Object^ sender, System::EventArgs^ e) {
+		if (listaNodosTemporal == nullptr ||
+			listaNodosTemporal->SelectedItem == nullptr) {
+			return;
+		}
+		int idNodo = Convert::ToInt32(listaNodosTemporal->SelectedItem);
 		CancelarComboBox();
-		return;
+		// Elimina buscando el índice real del nodo que tiene ese ID
+		miGrafo->eliminarNodoPorId(idNodo);
+		ReiniciarSimulacion();
+		PintarPanel();
 	}
-	listaNodosTemporal = gcnew ComboBox();
-	listaNodosTemporal->DropDownStyle = ComboBoxStyle::DropDownList;
-	listaNodosTemporal->Location = Delete_Node->Location;
-	listaNodosTemporal->Size = Delete_Node->Size;
-	for (int i = 1; i <= miGrafo->getNumNodos(); i++) {
-		listaNodosTemporal->Items->Add(i.ToString());
+
+	private: void CancelarComboBox() {
+		if (listaNodosTemporal == nullptr) return;
+		listaNodosTemporal->SelectionChangeCommitted -=
+			gcnew System::EventHandler(this, &MainPanel::EliminarNodoSeleccionado);
+		listaNodosTemporal->DropDownClosed -=
+			gcnew System::EventHandler(this, &MainPanel::ComboCerrado);
+		Buttons->Controls->Remove(listaNodosTemporal);
+		delete listaNodosTemporal;
+		listaNodosTemporal = nullptr;
+		Delete_Node->Text = L"Eliminar Nodo";
+		Delete_Node->Visible = true;
+		Delete_Node->BringToFront();
 	}
-	listaNodosTemporal->SelectedIndex = -1;
-	Delete_Node->Visible = false;
-	Buttons->Controls->Add(listaNodosTemporal);
-	listaNodosTemporal->BringToFront();
-	listaNodosTemporal->SelectionChangeCommitted +=
-		gcnew System::EventHandler(this, &MainPanel::EliminarNodoSeleccionado);
-	listaNodosTemporal->DroppedDown = true;
 
-	listaNodosTemporal->SelectionChangeCommitted +=
-		gcnew System::EventHandler(this, &MainPanel::EliminarNodoSeleccionado);
-	listaNodosTemporal->DropDownClosed +=
-		gcnew System::EventHandler(this, &MainPanel::ComboCerrado);   // <-- NUEVO
-	listaNodosTemporal->DroppedDown = true;
-}
-private: System::Void ComboCerrado(System::Object^ sender, System::EventArgs^ e) {
-	this->BeginInvoke(gcnew MethodInvoker(this, &MainPanel::CancelarComboBox));
-}
+	private: void MostrarInputNodos(Button^ boton, bool automatico) {
+		if (inputNodosTemporal != nullptr) CancelarInputNodos();
 
+		modoAutomatico = automatico;
+		botonOriginal = boton;
 
-private: System::Void EliminarNodoSeleccionado(System::Object^ sender, System::EventArgs^ e) {
-	if (listaNodosTemporal == nullptr ||
-		listaNodosTemporal->SelectedItem == nullptr) {
-		return;
+		lblLimitesTemporal = gcnew Label();
+		lblLimitesTemporal->Text = String::Format(L"Nodos ({0}-{1}):", MIN_NODOS, MAX_NODOS);
+		lblLimitesTemporal->ForeColor = Color::White;
+		lblLimitesTemporal->BackColor = Color::Transparent;
+		lblLimitesTemporal->Font = gcnew System::Drawing::Font(L"Comic Sans MS", 8.25F, FontStyle::Bold);
+		lblLimitesTemporal->AutoSize = false;
+		lblLimitesTemporal->TextAlign = ContentAlignment::MiddleCenter;
+		lblLimitesTemporal->Size = System::Drawing::Size(boton->Width, 16);
+		lblLimitesTemporal->Location = System::Drawing::Point(boton->Left, boton->Top - 17);
+
+		inputNodosTemporal = gcnew NumericUpDown();
+		inputNodosTemporal->Minimum = Decimal(MIN_NODOS);
+		inputNodosTemporal->Maximum = Decimal(MAX_NODOS);
+		inputNodosTemporal->Value = Decimal(MIN_NODOS);
+		inputNodosTemporal->TextAlign = HorizontalAlignment::Center;
+		inputNodosTemporal->Font = gcnew System::Drawing::Font(L"Comic Sans MS", 11.0F, FontStyle::Bold);
+		inputNodosTemporal->Location = boton->Location;
+		inputNodosTemporal->Width = boton->Width;
+
+		boton->Visible = false;
+		panel1->Controls->Add(lblLimitesTemporal);
+		panel1->Controls->Add(inputNodosTemporal);
+		lblLimitesTemporal->BringToFront();
+		inputNodosTemporal->BringToFront();
+
+		inputNodosTemporal->KeyDown +=
+			gcnew System::Windows::Forms::KeyEventHandler(this, &MainPanel::InputNodos_KeyDown);
+		inputNodosTemporal->Leave +=
+			gcnew System::EventHandler(this, &MainPanel::InputNodos_Leave);
+
+		inputNodosTemporal->Focus();
+		inputNodosTemporal->Select(0, inputNodosTemporal->Text->Length);
 	}
-	int nodo = Convert::ToInt32(listaNodosTemporal->SelectedItem);
-	CancelarComboBox();
-	miGrafo->eliminarNodo(nodo - 1);
-	ReiniciarSimulacion();
-	PintarPanel();
-}
-private: void CancelarComboBox() {
-	if (listaNodosTemporal == nullptr) return;
-	listaNodosTemporal->SelectionChangeCommitted -=
-		gcnew System::EventHandler(this, &MainPanel::EliminarNodoSeleccionado);
-	listaNodosTemporal->DropDownClosed -=
-		gcnew System::EventHandler(this, &MainPanel::ComboCerrado);  
-	Buttons->Controls->Remove(listaNodosTemporal);
-	delete listaNodosTemporal;
-	listaNodosTemporal = nullptr;
-	Delete_Node->Text = L"Eliminar_Nodo";
-	Delete_Node->Visible = true;
-	Delete_Node->BringToFront();
-}
-private: void MostrarInputNodos(Button^ boton, bool automatico) {
-	if (inputNodosTemporal != nullptr) CancelarInputNodos();
 
-	modoAutomatico = automatico;
-	botonOriginal = boton;
-
-	lblLimitesTemporal = gcnew Label();
-	lblLimitesTemporal->Text = String::Format(L"Nodos ({0}-{1}):", MIN_NODOS, MAX_NODOS);
-	lblLimitesTemporal->ForeColor = Color::White;
-	lblLimitesTemporal->BackColor = Color::Transparent;
-	lblLimitesTemporal->Font = gcnew System::Drawing::Font(L"Comic Sans MS", 8.25F, FontStyle::Bold);
-	lblLimitesTemporal->AutoSize = false;
-	lblLimitesTemporal->TextAlign = ContentAlignment::MiddleCenter;
-	lblLimitesTemporal->Size = System::Drawing::Size(boton->Width, 16);
-	lblLimitesTemporal->Location = System::Drawing::Point(boton->Left, boton->Top - 17);
-
-	inputNodosTemporal = gcnew NumericUpDown();
-	inputNodosTemporal->Minimum = Decimal(MIN_NODOS);
-	inputNodosTemporal->Maximum = Decimal(MAX_NODOS);
-	inputNodosTemporal->Value = Decimal(MIN_NODOS);
-	inputNodosTemporal->TextAlign = HorizontalAlignment::Center;
-	inputNodosTemporal->Font = gcnew System::Drawing::Font(L"Comic Sans MS", 11.0F, FontStyle::Bold);
-	inputNodosTemporal->Location = boton->Location;
-	inputNodosTemporal->Width = boton->Width;
-
-	boton->Visible = false;
-	panel1->Controls->Add(lblLimitesTemporal);
-	panel1->Controls->Add(inputNodosTemporal);
-	lblLimitesTemporal->BringToFront();
-	inputNodosTemporal->BringToFront();
-
-	inputNodosTemporal->KeyDown +=
-		gcnew System::Windows::Forms::KeyEventHandler(this, &MainPanel::InputNodos_KeyDown);
-	inputNodosTemporal->Leave +=
-		gcnew System::EventHandler(this, &MainPanel::InputNodos_Leave);
-
-	inputNodosTemporal->Focus();
-	inputNodosTemporal->Select(0, inputNodosTemporal->Text->Length);
-}
-
-private: System::Void InputNodos_KeyDown(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
-	if (e->KeyCode == Keys::Enter) {
-		e->SuppressKeyPress = true;
-		ConfirmarInputNodos();
+	private: System::Void InputNodos_KeyDown(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
+		if (e->KeyCode == Keys::Enter) {
+			e->SuppressKeyPress = true;
+			ConfirmarInputNodos();
+		}
+		else if (e->KeyCode == Keys::Escape) {
+			e->SuppressKeyPress = true;
+			CancelarInputNodos();
+		}
 	}
-	else if (e->KeyCode == Keys::Escape) {
-		e->SuppressKeyPress = true;
+
+	private: System::Void InputNodos_Leave(System::Object^ sender, System::EventArgs^ e) {
+		this->BeginInvoke(gcnew MethodInvoker(this, &MainPanel::CancelarSiPerdioFoco));
+	}
+
+	private: void CancelarSiPerdioFoco() {
+		if (inputNodosTemporal != nullptr && !inputNodosTemporal->Focused) {
+			CancelarInputNodos();
+		}
+	}
+
+	private: void ConfirmarInputNodos() {
+		if (inputNodosTemporal == nullptr) return;
+
+		int n;
+		if (!Int32::TryParse(inputNodosTemporal->Text, n)) {
+			n = Decimal::ToInt32(inputNodosTemporal->Value);
+		}
+		if (n < MIN_NODOS) n = MIN_NODOS;
+		if (n > MAX_NODOS) n = MAX_NODOS;
+
+		bool automatico = modoAutomatico;
 		CancelarInputNodos();
+
+		NuevoGrafo(n);
+		if (automatico) {
+			miGrafo->generarMatrizAleatoria();
+		}
+		ReiniciarSimulacion();
 	}
-}
 
-private: System::Void InputNodos_Leave(System::Object^ sender, System::EventArgs^ e) {
-	this->BeginInvoke(gcnew MethodInvoker(this, &MainPanel::CancelarSiPerdioFoco));
-}
+	private: void CancelarInputNodos() {
+		if (inputNodosTemporal == nullptr) return;
 
-private: void CancelarSiPerdioFoco() {
-	if (inputNodosTemporal != nullptr && !inputNodosTemporal->Focused) {
-		CancelarInputNodos();
+		inputNodosTemporal->KeyDown -=
+			gcnew System::Windows::Forms::KeyEventHandler(this, &MainPanel::InputNodos_KeyDown);
+		inputNodosTemporal->Leave -=
+			gcnew System::EventHandler(this, &MainPanel::InputNodos_Leave);
+
+		panel1->Controls->Remove(inputNodosTemporal);
+		panel1->Controls->Remove(lblLimitesTemporal);
+		delete inputNodosTemporal;
+		delete lblLimitesTemporal;
+		inputNodosTemporal = nullptr;
+		lblLimitesTemporal = nullptr;
+
+		if (botonOriginal != nullptr) {
+			botonOriginal->Visible = true;
+			botonOriginal = nullptr;
+		}
 	}
-}
-
-private: void ConfirmarInputNodos() {
-	if (inputNodosTemporal == nullptr) return;
-
-	int n;
-	if (!Int32::TryParse(inputNodosTemporal->Text, n)) {
-		n = Decimal::ToInt32(inputNodosTemporal->Value);
+	private: System::Void MainPanel_Load(System::Object^ sender, System::EventArgs^ e) {
 	}
-	if (n < MIN_NODOS) n = MIN_NODOS;
-	if (n > MAX_NODOS) n = MAX_NODOS;
-
-	bool automatico = modoAutomatico;
-	CancelarInputNodos();
-
-	NuevoGrafo(n);
-	if (automatico) {
-		miGrafo->generarMatrizAleatoria();
+	private: System::Void NodoAEliminar_TextChanged(System::Object^ sender, System::EventArgs^ e) {
 	}
-	ReiniciarSimulacion();
-}
-
-private: void CancelarInputNodos() {
-	if (inputNodosTemporal == nullptr) return;
-
-	inputNodosTemporal->KeyDown -=
-		gcnew System::Windows::Forms::KeyEventHandler(this, &MainPanel::InputNodos_KeyDown);
-	inputNodosTemporal->Leave -=
-		gcnew System::EventHandler(this, &MainPanel::InputNodos_Leave);
-
-	panel1->Controls->Remove(inputNodosTemporal);
-	panel1->Controls->Remove(lblLimitesTemporal);
-	delete inputNodosTemporal;
-	delete lblLimitesTemporal;
-	inputNodosTemporal = nullptr;
-	lblLimitesTemporal = nullptr;
-
-	if (botonOriginal != nullptr) {
-		botonOriginal->Visible = true;
-		botonOriginal = nullptr;
-	}
-}
-private: System::Void MainPanel_Load(System::Object^ sender, System::EventArgs^ e) {
-}
-private: System::Void NodoAEliminar_TextChanged(System::Object^ sender, System::EventArgs^ e) {
-}
-};
+	};
 }

@@ -17,17 +17,21 @@ private:
     int contador;
     int objetivo;
     Matriz vista; // Matriz principal que realiza los calculos
-	Matriz nuevas; // Matriz auxiliar que marca las celdas que se agregan en cada paso
+    Matriz nuevas; // Matriz auxiliar que marca las celdas que se agregan en cada paso
     vector<int> orden; // Orden de los nodos por ordenar
     vector<int> etiquetas; // Vector auxiliar que usa MatrizVisual
+    vector<int> nombresNodos; // Etiquetas reales de los nodos actuales (ej. 1, 2, 3, 5, 6)
     vector<vector<int>> bloques;
-	// Variables de estado para la visualización
+    // Variables de estado para la visualización
     int pivote, origen, compuerta, ventanaInicio, ventanaFin, malFila, malColumna;
     bool resumenFilas;
     wstring titulo;
     wstring mensaje;
 
     wstring nodoATexto(int nodo) {
+        if (nodo >= 0 && nodo < (int)nombresNodos.size()) {
+            return to_wstring(nombresNodos[nodo]);
+        }
         return to_wstring(nodo + 1);
     }
 
@@ -96,10 +100,10 @@ private:
                     if (paso(L"Matriz de caminos (en construcción)", texto)) return true;
                     continue;
                 }
-				vector<int> alcanzables; 
+                vector<int> alcanzables;
                 wstring celdasNuevas;
                 for (int j = 0; j < n; j++) {
-					if (vista[k][j] == 1) alcanzables.push_back(j); 
+                    if (vista[k][j] == 1) alcanzables.push_back(j);
                     if (vista[k][j] == 1 && vista[i][j] == 0) {
                         vista[i][j] = 1;
                         nuevas[i][j] = 1;
@@ -149,7 +153,8 @@ private:
             for (int j = 0; j < n; j++)
                 nueva[i][j] = vista[orden[i]][orden[j]];
         vista = nueva;
-        etiquetas = orden;
+        for (int i = 0; i < n; i++)
+            etiquetas[i] = nombresNodos[orden[i]] - 1;
         return paso(L"Matriz reordenada", L"Se reordenan filas y columnas con ese orden. Los nodos que se alcanzan entre sí quedan formando cuadrados de 1s sobre la diagonal.");
     }
 
@@ -194,16 +199,29 @@ public:
         return find(fila.begin(), fila.end(), 1) - fila.begin();
     }
 
-    void ejecutar(const Matriz& adyacencia, int pasoObjetivo) {
+    void ejecutar(const Matriz& adyacencia, int pasoObjetivo, const vector<int>& idsNodos = {}) {
         n = adyacencia.size();
         contador = 0;
         objetivo = pasoObjetivo;
         vista = adyacencia;
         nuevas = Matriz(n, vector<int>(n, 0));
         orden = vector<int>(n);
-		// Obtiene orden inicial de 0,1,...,n-1 para luego reordenar filas y columnas
+        // Obtiene orden inicial de 0,1,...,n-1 para luego reordenar filas y columnas
         iota(orden.begin(), orden.end(), 0);
-        etiquetas = orden;
+
+        if ((int)idsNodos.size() == n) {
+            nombresNodos = idsNodos;
+        }
+        else {
+            nombresNodos = vector<int>(n);
+            iota(nombresNodos.begin(), nombresNodos.end(), 1);
+        }
+
+        etiquetas = vector<int>(n);
+        for (int i = 0; i < n; i++) {
+            etiquetas[i] = nombresNodos[i] - 1;
+        }
+
         bloques.clear();
         limpiarMarcas();
 
@@ -219,10 +237,10 @@ public:
         paso(L"Componentes conexas", texto + L".");
     }
 
-    // Hace una copia sin alterar la matriz orignal.
-    int contarPasos(const Matriz& adyacencia) {
+    // Hace una copia sin alterar la matriz original.
+    int contarPasos(const Matriz& adyacencia, const vector<int>& idsNodos = {}) {
         Algoritmo recorrido;
-        recorrido.ejecutar(adyacencia, -1);
+        recorrido.ejecutar(adyacencia, -1, idsNodos);
         return recorrido.contador;
     }
 

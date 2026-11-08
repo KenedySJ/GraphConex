@@ -15,9 +15,11 @@ using namespace std;
 class Grafo {
 private:
     int numNodos;
-	int panelWidth;
-	int panelHeight;
+    int siguienteId;
+    int panelWidth;
+    int panelHeight;
     Matriz matrizAdyacencia;
+    vector<int> idsNodos;
     vector<Circulo*> nodosVis;
     vector<Arista*> aristas;
     Algoritmo algoritmo;
@@ -33,12 +35,13 @@ private:
         }
     }
 
-    void reconstruirPosicionesCirculos(){
+    void reconstruirPosicionesCirculos() {
         for (Circulo* nodo : nodosVis) delete nodo;
         nodosVis.clear();
         calcularPosicionesCirculos(numNodos, panelWidth, panelHeight);
     }
-	void calcularPosicionesCirculos(int n, int panelWidth, int panelHeight) {
+
+    void calcularPosicionesCirculos(int n, int panelWidth, int panelHeight) {
         int radioGrafo = (panelWidth < panelHeight ? panelWidth : panelHeight) / 2 - 40;
         int centroX = panelWidth / 2;
         int centroY = panelHeight / 2;
@@ -48,18 +51,23 @@ private:
             double angulo = i * (2.0 * 3.14159265 / n);
             int posX = centroX + (int)(radioGrafo * cos(angulo)) - (diametroNodo / 2);
             int posY = centroY + (int)(radioGrafo * sin(angulo)) - (diametroNodo / 2);
-            nodosVis.push_back(new Circulo(posX, posY, diametroNodo, 0, 0, 255, true, i + 1));
+            // Usa el ID real del nodo guardado en idsNodos[i]
+            nodosVis.push_back(new Circulo(posX, posY, diametroNodo, 0, 0, 255, true, idsNodos[i]));
         }
-	}
+    }
 
 public:
     Grafo(int n, int panelWidth, int panelHeight) {
-		this->panelHeight = panelHeight;
-		this->panelWidth = panelWidth;
+        this->panelHeight = panelHeight;
+        this->panelWidth = panelWidth;
         this->numNodos = n;
+        this->siguienteId = n + 1;
         matrizAdyacencia = Matriz(n, vector<int>(n, 0));
+        for (int i = 0; i < n; i++) {
+            idsNodos.push_back(i + 1);
+        }
         srand((unsigned)time(0));
-		calcularPosicionesCirculos(n, panelWidth, panelHeight);
+        calcularPosicionesCirculos(n, panelWidth, panelHeight);
     }
 
     ~Grafo() {
@@ -69,18 +77,26 @@ public:
 
     Algoritmo& getAlgoritmo() { return algoritmo; }
     int getNumNodos() { return numNodos; }
+    const vector<int>& getIdsNodos() const { return idsNodos; }
+
+    int obtenerIndicePorId(int idNodo) const {
+        for (int i = 0; i < numNodos; i++) {
+            if (idsNodos[i] == idNodo) return i;
+        }
+        return -1;
+    }
 
     Color colorComponente(int indice) {
         cli::array<Color>^ paleta = gcnew cli::array<Color>{
             Color::Red, Color::Green, Color::DarkOrange, Color::Purple,
-				Color::DeepPink, Color::Cyan, Color::Brown, Color::Teal, Color::Gold,
-                Color::DarkViolet, Color::DarkCyan, Color::DarkMagenta
+            Color::DeepPink, Color::Cyan, Color::Brown, Color::Teal, Color::Gold,
+            Color::DarkViolet, Color::DarkCyan, Color::DarkMagenta
         };
         return paleta[indice % paleta->Length];
     }
 
     void generarMatrizAleatoria() {
-        int probabilidad = (rand() % 26) + 10; 
+        int probabilidad = (rand() % 26) + 10;
         // rand 35-10+1=26, +10 
         for (int i = 0; i < numNodos; i++) {
             for (int j = 0; j < numNodos; j++) {
@@ -113,11 +129,11 @@ public:
     }
 
     void ejecutarPaso(int paso) {
-        algoritmo.ejecutar(matrizAdyacencia, paso);
+        algoritmo.ejecutar(matrizAdyacencia, paso, idsNodos);
     }
 
     int totalPasos() {
-        return algoritmo.contarPasos(matrizAdyacencia);
+        return algoritmo.contarPasos(matrizAdyacencia, idsNodos);
     }
 
     void dibujar(Graphics^ graphics, bool mostrarComponentes) {
@@ -147,12 +163,12 @@ public:
             double dy = centro2Y - centro1Y;
             double largo = sqrt(dx * dx + dy * dy);
             double radio = c1->getAncho() / 2.0;
-			// Normaliza el vector de dirección y calcula un desplazamiento lateral 
+            // Normaliza el vector de dirección y calcula un desplazamiento lateral 
             // para que las aristas no se dibujen exactamente sobre los nodos
             double ux = dx / largo;
             double uy = dy / largo;
-			// Desplazamiento lateral de 6 unidades
-			// Esto evita que dos aristas no se sobrepongan exactamente si van en direcciones opuestas
+            // Desplazamiento lateral de 6 unidades
+            // Esto evita que dos aristas no se sobrepongan exactamente si van en direcciones opuestas
             double lateralX = -uy * 6;
             double lateralY = ux * 6;
 
@@ -164,15 +180,18 @@ public:
 
         for (Circulo* c : nodosVis) c->dibujar(graphics);
     }
+
     // Segunda entrega desarrollo
     void agregarNodo() {
-		numNodos++;
-		matrizAdyacencia.resize(numNodos);
-		for (int i = 0; i < numNodos; i++) {
-			matrizAdyacencia[i].resize(numNodos, 0);
-		}
+        numNodos++;
+        idsNodos.push_back(siguienteId++);
+        matrizAdyacencia.resize(numNodos);
+        for (int i = 0; i < numNodos; i++) {
+            matrizAdyacencia[i].resize(numNodos, 0);
+        }
         reconstruirPosicionesCirculos();
     }
+
     void eliminarNodo(int nodoAEliminar) {
         if (nodoAEliminar < 0 || nodoAEliminar >= numNodos) return;
 
@@ -194,7 +213,17 @@ public:
         for (int i = 0; i < numNodos - 1; i++)
             matrizAdyacencia[i].erase(matrizAdyacencia[i].begin() + nodoAEliminar);
 
+        // Quita también el ID del nodo eliminado para conservar los números originales de los demás
+        idsNodos.erase(idsNodos.begin() + nodoAEliminar);
+
         numNodos--;
         reconstruirPosicionesCirculos();
+    }
+
+    void eliminarNodoPorId(int idNodo) {
+        int indice = obtenerIndicePorId(idNodo);
+        if (indice != -1) {
+            eliminarNodo(indice);
+        }
     }
 };
